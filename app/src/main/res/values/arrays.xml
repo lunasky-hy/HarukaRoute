@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="hosts_allowlist">
+        <item>com.google.android.projection.gearhead</item> <!-- Android Auto 正規ホスト -->
+        <item>com.lunaskyhy.harukaroute</item> <!-- 開発用のカスタムホスト（必要に応じて） -->
+    </string-array>
+</resources>
