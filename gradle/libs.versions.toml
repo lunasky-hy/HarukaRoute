@@ -1,5 +1,6 @@
 [versions]
 agp = "8.9.1"
+mapbox = "3.8.6"
 app = "1.4.0"
 kotlin = "2.0.21"
 coreKtx = "1.16.0"
@@ -13,6 +14,7 @@ uiTextGoogleFonts = "1.8.1"
 runtimeLivedata = "1.8.1"
 
 [libraries]
+mapbox-navigationcore = { module = "com.mapbox.navigationcore:android", version.ref = "mapbox" }
 androidx-app = { module = "androidx.car.app:app", version.ref = "app" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

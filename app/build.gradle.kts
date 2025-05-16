@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.androidx.app)
     implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.androidx.runtime.livedata)
+    implementation(libs.mapbox.navigationcore)
 
 
     testImplementation(libs.junit)
