@@ -14,6 +14,7 @@ composeBom = "2024.09.00"
 uiTextGoogleFonts = "1.8.1"
 runtimeLivedata = "1.8.1"
 fragmentKtx = "1.8.6"
+gmsLocation = "21.0.1"
 
 [libraries]
 mapbox-navigationcore = { group = "com.mapbox.navigationcore", name="android", version.ref = "mapbox" }
@@ -27,6 +28,7 @@ mapbox-navigationcore-androidauto = { group = "com.mapbox.navigationcore", name=
 mapbox-extension-androidauto = { group = "com.mapbox.extension", name="maps-androidauto", version.ref = "mapbox-extension" }
 
 androidx-app = { module = "androidx.car.app:app", version.ref = "app" }
+android-gms-location = { module = "com.google.android.gms:play-services-location", version.ref = "gmsLocation"}
 
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

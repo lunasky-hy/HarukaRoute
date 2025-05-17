@@ -5,7 +5,7 @@ import com.mapbox.navigation.core.MapboxNavigation
 import com.mapbox.navigation.core.lifecycle.MapboxNavigationObserver
 import com.mapbox.navigation.core.trip.session.LocationObserver
 
-open class HarukaMapNavigationObserver: MapboxNavigationObserver {
+open class MyMapNavigationObserver: MapboxNavigationObserver {
     private val locationObserver: LocationObserver = MyLocationObserver()
 
     override fun onAttached(mapboxNavigation: MapboxNavigation) {
@@ -17,6 +17,6 @@ open class HarukaMapNavigationObserver: MapboxNavigationObserver {
     }
 }
 
-class HarukaMapNavigationObserverWithContext(
+class MyMapNavigationObserverWithContext(
     private val context: Context,
-) : HarukaMapNavigationObserver()
+) : MyMapNavigationObserver()

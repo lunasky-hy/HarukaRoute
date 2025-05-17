@@ -1,12 +1,15 @@
 package com.lunaskyhy.harukaroute.car
 
 import android.content.Intent
+import android.util.Log
 import androidx.car.app.Screen
 import androidx.car.app.Session
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.mapbox.android.core.permissions.PermissionsManager
+import com.mapbox.maps.ContextMode
 import com.mapbox.maps.MapInitOptions
+import com.mapbox.maps.MapOptions
 import com.mapbox.maps.extension.androidauto.MapboxCarMap
 import com.mapbox.navigation.base.ExperimentalPreviewMapboxNavigationAPI
 import com.mapbox.navigation.base.options.NavigationOptions
@@ -18,9 +21,10 @@ import com.mapbox.navigation.ui.androidauto.screenmanager.MapboxScreen
 import com.mapbox.navigation.ui.androidauto.screenmanager.MapboxScreenManager
 import com.mapbox.navigation.ui.androidauto.screenmanager.prepareScreens
 
-class MainCarSession: Session() {
+class MainCarSession : Session() {
     private var mapboxCarMap: MapboxCarMap = MapboxCarMap()
     private val mapboxCarContext = MapboxCarContext(lifecycle, mapboxCarMap)
+    private val TAG = "MainCarSession"
 
     init {
         MapboxNavigationApp.attach(lifecycleOwner = this)
@@ -32,7 +36,7 @@ class MainCarSession: Session() {
                 .build()
         }
 
-        lifecycle.addObserver(object: DefaultLifecycleObserver {
+        lifecycle.addObserver(object : DefaultLifecycleObserver {
             override fun onCreate(owner: LifecycleOwner) {
                 if (!MapboxNavigationApp.isSetup()) {
                     MapboxNavigationApp.setup(
@@ -41,7 +45,13 @@ class MainCarSession: Session() {
                     )
                 }
 
-                mapboxCarMap.setup(carContext, MapInitOptions(context = carContext))
+                mapboxCarMap.setup(
+                    carContext,
+                    MapInitOptions(
+                        context = carContext,
+                        mapOptions = MapOptions.Builder().contextMode(ContextMode.SHARED).build()
+                    )
+                )
             }
 
             override fun onDestroy(owner: LifecycleOwner) {
@@ -51,9 +61,11 @@ class MainCarSession: Session() {
     }
 
     override fun onCreateScreen(intent: Intent): Screen {
+        Log.d(TAG, "onCreateScreen")
         val firstScreenKey = if (PermissionsManager.areLocationPermissionsGranted(carContext)) {
             MapboxScreenManager.current()?.key ?: MapboxScreen.FREE_DRIVE
         } else {
+
             MapboxScreen.NEEDS_LOCATION_PERMISSION
         }
 

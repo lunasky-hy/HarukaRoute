@@ -1,19 +1,17 @@
 package com.lunaskyhy.harukaroute
 
 import android.app.Application
-import com.mapbox.navigation.core.MapboxNavigation
 import com.mapbox.navigation.core.lifecycle.MapboxNavigationApp
-import com.mapbox.navigation.core.lifecycle.MapboxNavigationObserver
 
 class MainApplication: Application() {
     init {
-        MapboxNavigationApp.registerObserver(HarukaMapNavigationObserver())
+        MapboxNavigationApp.registerObserver(MyMapNavigationObserver())
     }
 
     override fun onCreate() {
         super.onCreate()
 
-        val observer = HarukaMapNavigationObserverWithContext(applicationContext)
+        val observer = MyMapNavigationObserverWithContext(applicationContext)
         MapboxNavigationApp.registerObserver(observer)
     }
 }
