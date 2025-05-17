@@ -31,8 +31,6 @@ dependencyResolutionManagement {
     }
 }
 
-
-
 rootProject.name = "HarukaRoute"
 include(":app")
  

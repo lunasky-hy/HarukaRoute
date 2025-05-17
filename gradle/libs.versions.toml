@@ -1,6 +1,7 @@
 [versions]
 agp = "8.9.1"
 mapbox = "3.8.6"
+mapbox-extension = "11.12.0-beta.1"
 app = "1.4.0"
 kotlin = "2.0.21"
 coreKtx = "1.16.0"
@@ -12,10 +13,21 @@ activityCompose = "1.10.1"
 composeBom = "2024.09.00"
 uiTextGoogleFonts = "1.8.1"
 runtimeLivedata = "1.8.1"
+fragmentKtx = "1.8.6"
 
 [libraries]
-mapbox-navigationcore = { module = "com.mapbox.navigationcore:android", version.ref = "mapbox" }
+mapbox-navigationcore = { group = "com.mapbox.navigationcore", name="android", version.ref = "mapbox" }
+mapbox-navigationcore-navigation =  { group = "com.mapbox.navigationcore", name="navigation", version.ref = "mapbox" }
+mapbox-navigationcore-copilot =     { group = "com.mapbox.navigationcore", name="copilot", version.ref = "mapbox" }
+mapbox-navigationcore-ui-maps =     { group = "com.mapbox.navigationcore", name="ui-maps", version.ref = "mapbox" }
+mapbox-navigationcore-tripdata =    { group = "com.mapbox.navigationcore", name="tripdata", version.ref = "mapbox" }
+mapbox-navigationcore-voice =       { group = "com.mapbox.navigationcore", name="voice", version.ref = "mapbox" }
+mapbox-navigationcore-ui-components = { group = "com.mapbox.navigationcore", name="ui-components", version.ref = "mapbox" }
+mapbox-navigationcore-androidauto = { group = "com.mapbox.navigationcore", name="android-auto-components", version.ref = "mapbox" }
+mapbox-extension-androidauto = { group = "com.mapbox.extension", name="maps-androidauto", version.ref = "mapbox-extension" }
+
 androidx-app = { module = "androidx.car.app:app", version.ref = "app" }
+
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -32,6 +44,7 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
+androidx-fragment-ktx = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "fragmentKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
