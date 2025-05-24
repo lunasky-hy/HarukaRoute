@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -27,9 +28,17 @@ import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.EdgeInsets
 import com.mapbox.maps.MapInitOptions
 import com.mapbox.maps.MapView
+import com.mapbox.maps.plugin.Plugin
 import com.mapbox.maps.plugin.animation.camera
+import com.mapbox.maps.plugin.compass.compass
 import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
 import com.mapbox.maps.plugin.locationcomponent.location
+import com.mapbox.maps.plugin.scalebar.ScaleBar
+import com.mapbox.maps.plugin.scalebar.ScaleBarPlugin
+import com.mapbox.maps.plugin.scalebar.generated.ScaleBarSettings
+import com.mapbox.maps.plugin.scalebar.generated.ScaleBarSettingsBase
+import com.mapbox.maps.plugin.scalebar.generated.ScaleBarSettingsInterface
+import com.mapbox.maps.plugin.scalebar.scalebar
 import com.mapbox.navigation.base.ExperimentalPreviewMapboxNavigationAPI
 import com.mapbox.navigation.base.options.NavigationOptions
 import com.mapbox.navigation.core.MapboxNavigation
@@ -38,6 +47,7 @@ import com.mapbox.navigation.core.lifecycle.MapboxNavigationApp
 import com.mapbox.navigation.core.lifecycle.MapboxNavigationObserver
 import com.mapbox.navigation.core.trip.session.LocationMatcherResult
 import com.mapbox.navigation.core.trip.session.LocationObserver
+import com.mapbox.navigation.ui.androidauto.internal.RendererUtils.dpToPx
 import com.mapbox.navigation.ui.maps.camera.NavigationCamera
 import com.mapbox.navigation.ui.maps.camera.data.MapboxNavigationViewportDataSource
 import com.mapbox.navigation.ui.maps.location.NavigationLocationProvider
@@ -176,20 +186,34 @@ class MainActivity : ComponentActivity() {
         // create a new Mapbox map
         mapView = MapView(this, mapInitOptions = MapInitOptions(applicationContext))
 
+        mapView.scalebar.updateSettings {
+            position = Gravity.BOTTOM or Gravity.END
+            borderWidth = 4f
+        }
+
+        mapView.compass.updateSettings {
+            position = Gravity.TOP or Gravity.END
+            marginTop = 100f
+            marginRight = 20f
+            clickable = true
+        }
+
         setContent {
             AppTheme {
                 Scaffold(
                     topBar = {},
                     bottomBar = {},
                 ) { paddingValues ->
-                    AndroidView(
+                     AndroidView(
                         factory = { mapView },
-                        modifier = Modifier.fillMaxSize().padding(
-                            top = 0.dp,
-                            bottom = paddingValues.calculateBottomPadding(),
-                            start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                            end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)
-                        ),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(
+                                top = 0.dp,
+                                bottom = paddingValues.calculateBottomPadding(),
+                                start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                                end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)
+                            ),
                     )
                 }
             }
