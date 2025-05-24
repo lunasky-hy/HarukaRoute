@@ -21,9 +21,9 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/harukaroute_icon"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/harukaroute_icon_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.HarukaRoute">
 
@@ -63,8 +63,8 @@
             android:name=".car.MainCarAppService"
             android:exported="true"
             android:label="@string/app_name"
-            android:icon="@mipmap/ic_launcher"
-            android:roundIcon="@mipmap/ic_launcher_round"
+            android:icon="@mipmap/harukaroute_icon_round"
+            android:roundIcon="@mipmap/harukaroute_icon_round"
             android:foregroundServiceType="location">
             <intent-filter>
                 <action android:name="androidx.car.app.CarAppService" />
