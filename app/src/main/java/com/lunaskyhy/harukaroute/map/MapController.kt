@@ -49,9 +49,14 @@ class MapController (
 
     private var viewportDataSource: MapboxNavigationViewportDataSource
     private var navigationCamera: NavigationCamera
-    private var routeLineApi: MapboxRouteLineApi
-    private var routeLineView: MapboxRouteLineView
     private val navigationLocationProvider = NavigationLocationProvider()
+
+    private val routeLineApi: MapboxRouteLineApi by lazy {
+        MapboxRouteLineApi(MapboxRouteLineApiOptions.Builder().build())
+    }
+    private val routeLineView: MapboxRouteLineView by lazy {
+        MapboxRouteLineView(MapboxRouteLineViewOptions.Builder(context).build())
+    }
 
     init {
         if (!MapboxNavigationApp.isSetup()) {
@@ -107,10 +112,6 @@ class MapController (
 
         // initialize a NavigationCamera
         navigationCamera = NavigationCamera(mapView.mapboxMap, mapView.camera, viewportDataSource)
-
-        // Initialize route line api and view for drawing the route on the map
-        routeLineApi = MapboxRouteLineApi(MapboxRouteLineApiOptions.Builder().build())
-        routeLineView = MapboxRouteLineView(MapboxRouteLineViewOptions.Builder(context).build())
     }
 
     fun lifecycleOnResume(owner: LifecycleOwner) {
@@ -123,7 +124,7 @@ class MapController (
         MapboxNavigationApp.registerObserver(navigationObserver)
     }
 
-    val navigationObserver =
+    private val navigationObserver =
         object : MapboxNavigationObserver {
             private val mutableLocation = MutableStateFlow<LocationMatcherResult?>(null)
             val locationFlow: Flow<LocationMatcherResult?> = mutableLocation
