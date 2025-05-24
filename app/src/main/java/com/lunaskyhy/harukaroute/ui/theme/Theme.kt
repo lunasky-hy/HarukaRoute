@@ -1,18 +1,17 @@
 package com.lunaskyhy.harukaroute.ui.theme
 
-import android.app.Activity
+import android.app.UiModeManager
+import android.content.Context
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
-import androidx.compose.material3.Typography
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 
 private val lightScheme = lightColorScheme(
@@ -255,6 +254,10 @@ val unspecified_scheme = ColorFamily(
     Color.Unspecified, Color.Unspecified, Color.Unspecified, Color.Unspecified
 )
 
+fun isContrastAvailable(): Boolean {
+    return Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
+}
+
 @Composable
 fun AppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -262,14 +265,26 @@ fun AppTheme(
     dynamicColor: Boolean = true,
     content: @Composable() () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
+    val context = LocalContext.current
+
+    var colorScheme = when {
+        dynamicColor -> {
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
         darkTheme -> darkScheme
         else -> lightScheme
+    }
+
+    if (isContrastAvailable()) {
+        val uiModeManager = context.getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
+
+        colorScheme = when (uiModeManager.contrast) {
+            in 0.0f..0.33f -> if (darkTheme) darkScheme else lightScheme
+            in 0.34f..0.66f -> if (darkTheme) mediumContrastDarkColorScheme else mediumContrastLightColorScheme
+            in 0.67f..1.0f -> if (darkTheme) highContrastDarkColorScheme else highContrastLightColorScheme
+            else -> if (darkTheme) darkScheme else lightScheme
+        }
     }
 
     MaterialTheme(

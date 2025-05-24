@@ -9,12 +9,24 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.sharp.Search
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -28,16 +40,10 @@ import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.EdgeInsets
 import com.mapbox.maps.MapInitOptions
 import com.mapbox.maps.MapView
-import com.mapbox.maps.plugin.Plugin
 import com.mapbox.maps.plugin.animation.camera
 import com.mapbox.maps.plugin.compass.compass
 import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
 import com.mapbox.maps.plugin.locationcomponent.location
-import com.mapbox.maps.plugin.scalebar.ScaleBar
-import com.mapbox.maps.plugin.scalebar.ScaleBarPlugin
-import com.mapbox.maps.plugin.scalebar.generated.ScaleBarSettings
-import com.mapbox.maps.plugin.scalebar.generated.ScaleBarSettingsBase
-import com.mapbox.maps.plugin.scalebar.generated.ScaleBarSettingsInterface
 import com.mapbox.maps.plugin.scalebar.scalebar
 import com.mapbox.navigation.base.ExperimentalPreviewMapboxNavigationAPI
 import com.mapbox.navigation.base.options.NavigationOptions
@@ -47,7 +53,6 @@ import com.mapbox.navigation.core.lifecycle.MapboxNavigationApp
 import com.mapbox.navigation.core.lifecycle.MapboxNavigationObserver
 import com.mapbox.navigation.core.trip.session.LocationMatcherResult
 import com.mapbox.navigation.core.trip.session.LocationObserver
-import com.mapbox.navigation.ui.androidauto.internal.RendererUtils.dpToPx
 import com.mapbox.navigation.ui.maps.camera.NavigationCamera
 import com.mapbox.navigation.ui.maps.camera.data.MapboxNavigationViewportDataSource
 import com.mapbox.navigation.ui.maps.location.NavigationLocationProvider
@@ -187,14 +192,15 @@ class MainActivity : ComponentActivity() {
         mapView = MapView(this, mapInitOptions = MapInitOptions(applicationContext))
 
         mapView.scalebar.updateSettings {
-            position = Gravity.BOTTOM or Gravity.END
+            position = Gravity.BOTTOM or Gravity.START
             borderWidth = 4f
+            marginBottom = 80f
         }
 
         mapView.compass.updateSettings {
             position = Gravity.TOP or Gravity.END
             marginTop = 100f
-            marginRight = 20f
+            marginRight = 50f
             clickable = true
         }
 
@@ -203,8 +209,11 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     topBar = {},
                     bottomBar = {},
+                    floatingActionButton = {
+                        FloatingButton(onClick = {})
+                    }
                 ) { paddingValues ->
-                     AndroidView(
+                    AndroidView(
                         factory = { mapView },
                         modifier = Modifier
                             .fillMaxSize()
@@ -240,6 +249,14 @@ class MainActivity : ComponentActivity() {
                 40.0 * pixelDensity
             )
 
+
+        mapView.mapboxMap.setCamera(
+            CameraOptions.Builder()
+                .center(Point.fromLngLat(139.7644865, 35.6811398))
+                .zoom(14.0)
+                .build()
+        )
+
         // initialize a NavigationCamera
         navigationCamera = NavigationCamera(mapView.mapboxMap, mapView.camera, viewportDataSource)
 
@@ -248,7 +265,7 @@ class MainActivity : ComponentActivity() {
         routeLineView = MapboxRouteLineView(MapboxRouteLineViewOptions.Builder(this).build())
     }
 
-// locationObserver updates the location puck and camera to follow the user's location
+    // locationObserver updates the location puck and camera to follow the user's location
     private val locationObserver =
         object : LocationObserver {
             override fun onNewRawLocation(rawLocation: Location) {}
@@ -386,7 +403,7 @@ class MainActivity : ComponentActivity() {
 //                override fun onRoutesReady(routes: List<NavigationRoute>, routerOrigin: String) {
 //                    mapboxNavigation.setNavigationRoutes(routes)
 
-                    // start simulated user movement
+    // start simulated user movement
 //                    val replayData =
 //                        replayRouteMapper.mapDirectionsRouteGeometry(routes.first().directionsRoute)
 //                    mapboxNavigation.mapboxReplayer.pushEvents(replayData)
@@ -396,4 +413,36 @@ class MainActivity : ComponentActivity() {
 //            }
 //        )
 //    }
+}
+
+@Composable
+fun FloatingButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier.padding(
+            bottom = dimensionResource(R.dimen.floating_button_bottom_padding)
+        ).size(dimensionResource(R.dimen.floating_button_size)),
+        shape = CircleShape,
+        contentPadding = PaddingValues(0.dp),
+        colors = ButtonColors(
+            MaterialTheme.colorScheme.primary,
+            MaterialTheme.colorScheme.onPrimary,
+            MaterialTheme.colorScheme.primaryContainer,
+            MaterialTheme.colorScheme.onPrimaryContainer
+        )
+    ) {
+        Icon(Icons.Sharp.Search, contentDescription = "Search Location")
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun FloatingButtonPreview() {
+    AppTheme {
+        FloatingButton()
+    }
 }
