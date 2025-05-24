@@ -8,6 +8,7 @@ import android.view.Gravity
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
@@ -31,28 +32,43 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.lunaskyhy.harukaroute.ui.theme.AppTheme
+import com.mapbox.api.directions.v5.models.RouteOptions
 import com.mapbox.common.location.Location
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.EdgeInsets
 import com.mapbox.maps.MapInitOptions
 import com.mapbox.maps.MapView
+import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.animation.camera
 import com.mapbox.maps.plugin.compass.compass
 import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
 import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.plugin.scalebar.scalebar
 import com.mapbox.navigation.base.ExperimentalPreviewMapboxNavigationAPI
+import com.mapbox.navigation.base.extensions.applyDefaultNavigationOptions
 import com.mapbox.navigation.base.options.NavigationOptions
+import com.mapbox.navigation.base.route.NavigationRoute
+import com.mapbox.navigation.base.route.NavigationRouterCallback
+import com.mapbox.navigation.base.route.RouterFailure
+import com.mapbox.navigation.base.trip.model.RouteProgress
+import com.mapbox.navigation.base.trip.model.RouteProgressState
 import com.mapbox.navigation.core.MapboxNavigation
 import com.mapbox.navigation.core.directions.session.RoutesObserver
+import com.mapbox.navigation.core.directions.session.RoutesUpdatedResult
 import com.mapbox.navigation.core.lifecycle.MapboxNavigationApp
 import com.mapbox.navigation.core.lifecycle.MapboxNavigationObserver
+import com.mapbox.navigation.core.mapmatching.MapMatchingAPICallback
+import com.mapbox.navigation.core.mapmatching.MapMatchingFailure
+import com.mapbox.navigation.core.mapmatching.MapMatchingOptions
+import com.mapbox.navigation.core.mapmatching.MapMatchingSuccessfulResult
 import com.mapbox.navigation.core.trip.session.LocationMatcherResult
 import com.mapbox.navigation.core.trip.session.LocationObserver
+import com.mapbox.navigation.core.trip.session.RouteProgressObserver
 import com.mapbox.navigation.ui.maps.camera.NavigationCamera
 import com.mapbox.navigation.ui.maps.camera.data.MapboxNavigationViewportDataSource
 import com.mapbox.navigation.ui.maps.location.NavigationLocationProvider
@@ -63,32 +79,6 @@ import com.mapbox.navigation.ui.maps.route.line.model.MapboxRouteLineViewOptions
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
-//class MainActivity : ComponentActivity() {
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        enableEdgeToEdge()
-//        setContent {
-//            val carConnectionType by CarConnection(this).type.observeAsState(initial = -1)
-//
-//            AppTheme {
-//                Surface {
-//                    Column {
-//                        Text(
-//                            text = "Places",
-//                            style = MaterialTheme.typography.displayLarge,
-//                            modifier = Modifier.padding(8.dp)
-//                        )
-//                        ProjectionState(
-//                            carConnectionType = carConnectionType,
-//                            modifier = Modifier.padding(8.dp)
-//                        )
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
-
 const val TAG = "MainActivity"
 
 class MainActivity : ComponentActivity() {
@@ -98,6 +88,8 @@ class MainActivity : ComponentActivity() {
     private lateinit var routeLineApi: MapboxRouteLineApi
     private lateinit var routeLineView: MapboxRouteLineView
     private val navigationLocationProvider = NavigationLocationProvider()
+    private var navigateIsStarted = false
+    private var routeRequestId: Long = 0
 
     init {
         lifecycle.addObserver(object : DefaultLifecycleObserver {
@@ -204,13 +196,14 @@ class MainActivity : ComponentActivity() {
             clickable = true
         }
 
+        enableEdgeToEdge()
         setContent {
             AppTheme {
                 Scaffold(
                     topBar = {},
                     bottomBar = {},
                     floatingActionButton = {
-                        FloatingButton(onClick = {})
+                        FloatingButton(onClick = {if (routeRequestId.toInt() == 0) setRoute() else cancelRoute()})
                     }
                 ) { paddingValues ->
                     AndroidView(
@@ -294,48 +287,70 @@ class MainActivity : ComponentActivity() {
                                 enhancedLocation.longitude,
                                 enhancedLocation.latitude
                             )
-                        ).zoom(14.0)
+                        )
                         .build()
                 )
                 Log.d(TAG, "locationObserver onNewLocationMatcherResult is completed.")
             }
         }
 
-    // routes observer draws a route line and origin/destination circles on the map
-    private val routesObserver = RoutesObserver { routeUpdateResult ->
-        if (routeUpdateResult.navigationRoutes.isNotEmpty()) {
-            // generate route geometries asynchronously and render them
-            routeLineApi.setNavigationRoutes(routeUpdateResult.navigationRoutes) { value ->
-                mapView.mapboxMap.style?.apply { routeLineView.renderRouteDrawData(this, value) }
+    @OptIn(ExperimentalPreviewMapboxNavigationAPI::class)
+    private val routesObserver = object : RoutesObserver {
+        override fun onRoutesChanged(result: RoutesUpdatedResult) {
+            if (result.navigationRoutes.isNotEmpty()) {
+                // generate route geometries asynchronously and render them
+                routeLineApi.setNavigationRoutes(result.navigationRoutes) { value ->
+                    mapView.mapboxMap.style?.apply {
+                        routeLineView.renderRouteDrawData(
+                            this,
+                            value
+                        )
+                    }
+                }
+
+                // update viewportSourceData to include the new route
+                viewportDataSource.onRouteChanged(result.navigationRoutes.first())
+                viewportDataSource.evaluate()
+
+                // set the navigationCamera to OVERVIEW
+                navigationCamera.requestNavigationCameraToOverview()
             }
-
-            // update viewportSourceData to include the new route
-            viewportDataSource.onRouteChanged(routeUpdateResult.navigationRoutes.first())
-            viewportDataSource.evaluate()
-
-            // set the navigationCamera to OVERVIEW
-            navigationCamera.requestNavigationCameraToOverview()
         }
     }
 
+    private val routeProgressObserver = object : RouteProgressObserver {
+        override fun onRouteProgressChanged(routeProgress: RouteProgress) {
+            routeProgress.currentState.let { currentState ->
+                when (currentState) {
+                    RouteProgressState.INITIALIZED -> Log.d(TAG, "R.drawable.your_drawable_for_initialized_state")
+                    RouteProgressState.TRACKING -> Log.d(TAG, "R.drawable.your_drawable_for_tracking_state")
+                    RouteProgressState.COMPLETE -> Log.d(TAG, "R.drawable.your_drawable_for_complete_state")
+                    RouteProgressState.OFF_ROUTE -> Log.d(TAG, "R.drawable.your_drawable_for_off_route_state")
+                    RouteProgressState.UNCERTAIN -> Log.d(TAG, "R.drawable.your_drawable_for_uncertain_state")
+                }
+                mapView.location.apply {
+                    this.locationPuck = LocationPuck2D()
+                }
+            }
+        }
+    }
 
-    @OptIn(ExperimentalPreviewMapboxNavigationAPI::class)
     private val navigationObserver =
         object : MapboxNavigationObserver {
             private val mutableLocation = MutableStateFlow<LocationMatcherResult?>(null)
             val locationFlow: Flow<LocationMatcherResult?> = mutableLocation
+            lateinit var navigation: MapboxNavigation
 
             @SuppressLint("MissingPermission")
             override fun onAttached(mapboxNavigation: MapboxNavigation) {
                 Log.d(TAG, "navigationObserver onAttached is called.")
 
-                mapboxNavigation.registerRoutesObserver(routesObserver)
-                mapboxNavigation.registerLocationObserver(locationObserver)
+                navigation = mapboxNavigation
 
-//                replayProgressObserver =
-//                    ReplayProgressObserver(mapboxNavigation.mapboxReplayer)
-//                mapboxNavigation.registerRouteProgressObserver(replayProgressObserver)
-//                mapboxNavigation.startReplayTripSession()
+                mapboxNavigation.registerLocationObserver(locationObserver)
+                mapboxNavigation.registerRoutesObserver(routesObserver)
+                mapboxNavigation.registerRouteProgressObserver(routeProgressObserver)
+
                 mapboxNavigation.startTripSession()
 
                 Log.d(TAG, "navigationObserver onAttached is completed.")
@@ -345,35 +360,49 @@ class MainActivity : ComponentActivity() {
                 Log.d(TAG, "navigationObserver onDetached is called.")
                 mapboxNavigation.stopTripSession()
                 mapboxNavigation.unregisterLocationObserver(locationObserver)
+                mapboxNavigation.unregisterRoutesObserver(routesObserver)
+                mapboxNavigation.unregisterRouteProgressObserver(routeProgressObserver)
+
                 Log.d(TAG, "navigationObserver onDetached is completed.")
             }
         }
 
-//    private lateinit var replayProgressObserver: ReplayProgressObserver
-//    private val replayRouteMapper = ReplayRouteMapper()
 
-    // define MapboxNavigation
-//    @OptIn(ExperimentalPreviewMapboxNavigationAPI::class)
-//    private val mapboxNavigation: MapboxNavigation by
-//    requireMapboxNavigation(
-//        onResumedObserver =
-//            object : MapboxNavigationObserver {
-//                @SuppressLint("MissingPermission")
-//                override fun onAttached(mapboxNavigation: MapboxNavigation) {
-//                    // register observers
-//                    mapboxNavigation.registerRoutesObserver(routesObserver)
-//                    mapboxNavigation.registerLocationObserver(locationObserver)
-//
-//                    replayProgressObserver =
-//                        ReplayProgressObserver(mapboxNavigation.mapboxReplayer)
-//                    mapboxNavigation.registerRouteProgressObserver(replayProgressObserver)
-//                    mapboxNavigation.startReplayTripSession()
-//                }
-//
-//                override fun onDetached(mapboxNavigation: MapboxNavigation) {}
-//            },
-//        onInitialize = this::initNavigation
-//    )
+    private fun setRoute() {
+        Log.d(TAG, "setRoute is called.")
+
+        val lastLocation = navigationLocationProvider.lastLocation ?: return
+        val origin = Point.fromLngLat(lastLocation.longitude, lastLocation.latitude)
+        val destination = Point.fromLngLat(139.6974803, 35.6900803)
+
+        val navigation = navigationObserver.navigation
+
+        routeRequestId = navigation.requestRoutes(
+            RouteOptions.builder()
+                .applyDefaultNavigationOptions()
+                .coordinatesList(listOf(origin, destination))
+                .layersList(listOf(navigation.getZLevel(), null))
+                .build(),
+            object : NavigationRouterCallback {
+                override fun onCanceled(routeOptions: RouteOptions, routerOrigin: String) {}
+
+                override fun onFailure(reasons: List<RouterFailure>, routeOptions: RouteOptions) {}
+
+                override fun onRoutesReady(routes: List<NavigationRoute>, routerOrigin: String) {
+                    navigation.setNavigationRoutes(routes)
+                }
+            }
+        )
+    }
+
+    private fun cancelRoute() {
+        Log.d(TAG, "cancelRoute is called.")
+
+        val navigation = navigationObserver.navigation
+        navigation.cancelRouteRequest(routeRequestId)
+
+        routeRequestId = 0
+    }
 
     // on initialization of MapboxNavigation, request a route between two fixed points
 //    @OptIn(ExperimentalPreviewMapboxNavigationAPI::class)
@@ -418,10 +447,12 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun FloatingButton(
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     onClick: () -> Unit = {}
 ) {
     Button(
         onClick = onClick,
+        enabled = enabled,
         modifier = modifier.padding(
             bottom = dimensionResource(R.dimen.floating_button_bottom_padding)
         ).size(dimensionResource(R.dimen.floating_button_size)),
