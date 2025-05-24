@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="padding_small">6dp</dimen>
+    <dimen name="padding_medium">12dp</dimen>
+    <dimen name="padding_medium_large">18dp</dimen>
+    <dimen name="padding_large">24dp</dimen>
+    <dimen name="floating_button_size">64dp</dimen>
+    <dimen name="floating_button_bottom_padding">32dp</dimen>
+</resources>
