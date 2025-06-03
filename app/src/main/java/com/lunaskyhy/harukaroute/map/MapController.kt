@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import android.view.Gravity
-import android.view.View
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.coroutineScope
@@ -17,7 +16,6 @@ import com.mapbox.maps.EdgeInsets
 import com.mapbox.maps.MapInitOptions
 import com.mapbox.maps.MapView
 import com.mapbox.maps.MapboxDelicateApi
-import com.mapbox.maps.ViewAnnotationAnchorConfig
 import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.animation.camera
@@ -46,9 +44,6 @@ import com.mapbox.navigation.ui.maps.camera.data.MapboxNavigationViewportDataSou
 import com.mapbox.navigation.ui.maps.location.NavigationLocationProvider
 import com.mapbox.navigation.ui.maps.route.callout.api.DefaultRouteCalloutAdapter
 import com.mapbox.navigation.ui.maps.route.callout.api.DefaultRouteCalloutAdapter.CalloutClickData
-import com.mapbox.navigation.ui.maps.route.callout.api.MapboxRouteCalloutAdapter
-import com.mapbox.navigation.ui.maps.route.callout.model.CalloutViewHolder
-import com.mapbox.navigation.ui.maps.route.callout.model.RouteCallout
 import com.mapbox.navigation.ui.maps.route.line.MapboxRouteLineApiExtensions.setNavigationRoutes
 import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineApi
 import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineView

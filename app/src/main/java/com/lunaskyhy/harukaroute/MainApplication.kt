@@ -1,10 +1,13 @@
 package com.lunaskyhy.harukaroute
 
 import android.app.Application
-import com.mapbox.navigation.base.options.NavigationOptions
-import com.mapbox.navigation.core.lifecycle.MapboxNavigationApp
+import com.lunaskyhy.harukaroute.map.MapControllerProvider
 
 class MainApplication: Application() {
+    override fun onCreate() {
+        super.onCreate()
+        MapControllerProvider.initialize(applicationContext)
+    }
 }
 
 //1. MyObserver / MyObserverWithContext の目的
