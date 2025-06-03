@@ -104,7 +104,9 @@ class MainActivity : ComponentActivity() {
                     topBar = {},
                     bottomBar = {},
                     floatingActionButton = {
-                        FloatingButton(onClick = {})
+                        FloatingButton(onClick = {
+                            mapController.routeSearchOnClick()
+                        })
                     }
                 ) { paddingValues ->
                     AndroidView(
