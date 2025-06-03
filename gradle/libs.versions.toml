@@ -15,6 +15,8 @@ uiTextGoogleFonts = "1.8.1"
 runtimeLivedata = "1.8.1"
 fragmentKtx = "1.8.6"
 gmsLocation = "21.0.1"
+composeNav = "2.9.0"
+
 
 [libraries]
 mapbox-navigationcore = { group = "com.mapbox.navigationcore", name="android", version.ref = "mapbox" }
@@ -47,6 +49,7 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
 androidx-fragment-ktx = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "fragmentKtx" }
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "composeNav" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

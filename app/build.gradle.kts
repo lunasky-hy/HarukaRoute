@@ -53,6 +53,7 @@ dependencies {
     implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.fragment.ktx)
+    implementation(libs.androidx.navigation.compose)
 
     implementation(libs.mapbox.navigationcore)
     implementation(libs.mapbox.navigationcore.navigation)

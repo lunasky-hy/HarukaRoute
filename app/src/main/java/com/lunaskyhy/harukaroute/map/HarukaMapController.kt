@@ -55,7 +55,7 @@ import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalPreviewMapboxNavigationAPI::class)
-class MapController (
+class HarukaMapController (
     private val context: Context,
 ){
     var mapView: MapView = MapView(context, mapInitOptions = MapInitOptions(context))
