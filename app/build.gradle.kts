@@ -50,6 +50,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.app)
+    implementation(libs.androidx.gms.location)
     implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.fragment.ktx)
@@ -65,6 +66,13 @@ dependencies {
     implementation(libs.mapbox.navigationcore.androidauto)
     implementation(libs.mapbox.navigationcore.androidauto)
     implementation(libs.mapbox.extension.androidauto)
+
+    implementation(libs.mapbox.search.autofill)
+    implementation(libs.mapbox.search.discover)
+    implementation(libs.mapbox.search.place.autocomplete)
+    implementation(libs.mapbox.search.offline)
+    implementation(libs.mapbox.search.mapbox.search.android)
+    implementation(libs.mapbox.search.mapbox.search.android.ui)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

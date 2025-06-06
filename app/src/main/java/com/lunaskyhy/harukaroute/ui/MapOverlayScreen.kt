@@ -55,7 +55,4 @@ fun MapOverlayScreen(
 
 enum class NavRoute {
     Free,
-    Search,
-    Route,
-    Navigate,
 }

@@ -8,6 +8,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.coroutineScope
 import com.lunaskyhy.harukaroute.TAG
+import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.api.directions.v5.models.RouteOptions
 import com.mapbox.common.location.Location
 import com.mapbox.geojson.Point
@@ -20,6 +21,8 @@ import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.animation.camera
 import com.mapbox.maps.plugin.compass.compass
+import com.mapbox.maps.plugin.gestures.OnMoveListener
+import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
 import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.plugin.scalebar.scalebar
@@ -51,6 +54,8 @@ import com.mapbox.navigation.ui.maps.route.line.model.MapboxRouteLineApiOptions
 import com.mapbox.navigation.ui.maps.route.line.model.MapboxRouteLineViewOptions
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 
@@ -65,8 +70,10 @@ class HarukaMapController (
     private lateinit var navigation: MapboxNavigation
     private var viewportDataSource: MapboxNavigationViewportDataSource
     private var navigationCamera: NavigationCamera
-    private val navigationLocationProvider = NavigationLocationProvider()
-    private var isTrackingFlag: Boolean = true
+    val navigationLocationProvider = NavigationLocationProvider()
+    private val _isCameraFollowingPosition = MutableStateFlow(true)
+    var isCameraFollowingPosition: StateFlow<Boolean> = _isCameraFollowingPosition.asStateFlow()
+//    var isCameraFollowingPosition: Boolean = true
 
     private val routeLineApi: MapboxRouteLineApi by lazy {
         MapboxRouteLineApi(MapboxRouteLineApiOptions.Builder()
@@ -125,6 +132,13 @@ class HarukaMapController (
                 .build()
         )
 
+        mapView.gestures.addOnMoveListener(object : OnMoveListener {
+            override fun onMove(detector: MoveGestureDetector): Boolean { return false }
+            override fun onMoveBegin(detector: MoveGestureDetector) { toggleCameraFollowingPosition(false) }
+            override fun onMoveEnd(detector: MoveGestureDetector) {}
+
+        })
+
         // set viewportDataSource, which tells the navigationCamera where to look
         viewportDataSource = MapboxNavigationViewportDataSource(mapView.mapboxMap)
 
@@ -161,6 +175,10 @@ class HarukaMapController (
             Point.fromLngLat(139.6937075, 35.6820377)
         ))
         Log.d(TAG, "routeSearchOnClick is finished.")
+    }
+
+    fun toggleCameraFollowingPosition(isFollowing: Boolean) {
+        _isCameraFollowingPosition.value = isFollowing
     }
 
     private val navigationObserver =
@@ -222,7 +240,7 @@ class HarukaMapController (
                 // set the navigationCamera to FOLLOWING
                 navigationCamera.requestNavigationCameraToFollowing()
 
-                if (isTrackingFlag) {
+                if (_isCameraFollowingPosition.value) {
                     mapView.mapboxMap.setCamera(
                         CameraOptions.Builder()
                             .center(
@@ -308,7 +326,6 @@ class HarukaMapController (
                         Log.d(TAG, "route : $it")
                     }
                     if (routes.isNotEmpty()) {
-                        isTrackingFlag = false
                         val overviewOption = mapView.mapboxMap
                             .cameraForCoordinates(
                                 coordinates,
@@ -365,5 +382,4 @@ class HarukaMapController (
             }
         }
     }
-
 }
