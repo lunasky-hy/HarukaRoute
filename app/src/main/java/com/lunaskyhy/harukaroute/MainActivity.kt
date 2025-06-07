@@ -27,6 +27,7 @@ class MainActivity : ComponentActivity() {
             override fun onCreate(owner: LifecycleOwner) {
                 Log.d(TAG, "lifecycle onCreate is started.")
                 super.onCreate(owner)
+                harukaMapController.initializeMapView()
                 Log.d(TAG, "lifecycle onCreate is completed.")
             }
 
@@ -42,6 +43,12 @@ class MainActivity : ComponentActivity() {
                 harukaMapController.lifecycleOnPause(owner)
                 Log.d(TAG, "lifecycle onPause is completed.")
             }
+
+            @SuppressLint("Lifecycle")
+            override fun onDestroy(owner: LifecycleOwner) {
+                super.onDestroy(owner)
+                harukaMapController.mapView.onDestroy()
+            }
         })
     }
 
@@ -55,9 +62,6 @@ class MainActivity : ComponentActivity() {
             ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
             ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
         ) {
-            // Permissions are already granted
-            renderMap()
-            Log.d(TAG, "initializeMapComponents is completed. (in Activity.onCreated.)")
         } else {
             // Request location permissions
             locationPermissionRequest.launch(
@@ -68,6 +72,12 @@ class MainActivity : ComponentActivity() {
             )
         }
         Log.d(TAG, "Activity onCreate is completed.")
+    }
+
+    override fun onStart() {
+        super.onStart()
+        renderMap()
+        Log.d(TAG, "initializeMapComponents is completed. (in Activity.onCreated.)")
     }
 
     // Activity result launcher for location permissions

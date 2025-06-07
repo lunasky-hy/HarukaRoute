@@ -1,9 +1,11 @@
 package com.lunaskyhy.harukaroute.map
 
+import android.annotation.SuppressLint
 import android.content.Context
 
 object MapControllerProvider {
 
+    @SuppressLint("StaticFieldLeak")
     private lateinit var _Haruka_mapController: HarukaMapController
     val harukaMapController: HarukaMapController
         get() {

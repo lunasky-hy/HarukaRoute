@@ -11,20 +11,24 @@ import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lunaskyhy.harukaroute.R
 import com.lunaskyhy.harukaroute.map.HarukaMapController
 import com.lunaskyhy.harukaroute.map.MapControllerProvider
+import com.lunaskyhy.harukaroute.ui.AppViewModelProvider
 import com.lunaskyhy.harukaroute.ui.theme.AppTheme
 
 @Composable
 fun FreeDriveScreen(
     modifier: Modifier = Modifier,
+    viewModel: FreeDriveViewModel = viewModel(factory = AppViewModelProvider.viewModelFactory),
     mapController: HarukaMapController = MapControllerProvider.harukaMapController
 ) {
     val isCameraFollowingPosition = mapController.isCameraFollowingPosition.collectAsState()
@@ -75,6 +79,8 @@ fun FollowCurrentLocation(modifier: Modifier = Modifier, onClick: () -> Unit) {
     FloatingActionButton(
         onClick = onClick,
         shape = CircleShape,
+        contentColor = MaterialTheme.colorScheme.onPrimary,
+        containerColor = MaterialTheme.colorScheme.primary,
         modifier = modifier // 必要に応じてmodifierを適用
     ) {
         Icon(
@@ -90,6 +96,8 @@ fun SearchLocationButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
     FloatingActionButton(
         onClick = onClick,
         shape = CircleShape,
+        contentColor = MaterialTheme.colorScheme.onPrimary,
+        containerColor = MaterialTheme.colorScheme.primary,
         modifier = modifier// 必要に応じてmodifierを適用
     ) {
         Icon(

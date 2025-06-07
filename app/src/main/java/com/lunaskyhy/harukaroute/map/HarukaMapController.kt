@@ -63,7 +63,7 @@ import kotlinx.coroutines.launch
 class HarukaMapController (
     private val context: Context,
 ){
-    var mapView: MapView = MapView(context, mapInitOptions = MapInitOptions(context))
+    lateinit var mapView: MapView
         private set
 
     private lateinit var lifecycleScope: Lifecycle
@@ -73,26 +73,6 @@ class HarukaMapController (
     val navigationLocationProvider = NavigationLocationProvider()
     private val _isCameraFollowingPosition = MutableStateFlow(true)
     var isCameraFollowingPosition: StateFlow<Boolean> = _isCameraFollowingPosition.asStateFlow()
-//    var isCameraFollowingPosition: Boolean = true
-
-    private val routeLineApi: MapboxRouteLineApi by lazy {
-        MapboxRouteLineApi(MapboxRouteLineApiOptions.Builder()
-            .isRouteCalloutsEnabled(true)
-            .build())
-    }
-    private val routeLineView: MapboxRouteLineView by lazy {
-        val routeCalloutClickListener: ((CalloutClickData) -> Unit) = { data ->
-            reorderRoutes(data.route)
-        }
-
-        MapboxRouteLineView(MapboxRouteLineViewOptions.Builder(context).build())
-            .also {
-                it.enableCallouts(
-                    mapView.viewAnnotationManager,
-                    DefaultRouteCalloutAdapter(context, routeCalloutClickListener = routeCalloutClickListener)
-                )
-            }
-    }
 
     init {
         if (!MapboxNavigationApp.isSetup()) {
@@ -104,40 +84,7 @@ class HarukaMapController (
             }
         }
 
-        // Initialize location puck using navigationLocationProvider as its data source
-        mapView.location.apply {
-            setLocationProvider(navigationLocationProvider)
-            locationPuck = createDefault2DPuck()
-            puckBearingEnabled = true
-            enabled = true
-        }
-
-        mapView.scalebar.updateSettings {
-            position = Gravity.BOTTOM or Gravity.START
-            borderWidth = 4f
-            marginBottom = 80f
-        }
-
-        mapView.compass.updateSettings {
-            position = Gravity.TOP or Gravity.END
-            marginTop = 100f
-            marginRight = 50f
-            clickable = true
-        }
-
-        mapView.mapboxMap.setCamera(
-            CameraOptions.Builder()
-                .center(Point.fromLngLat(139.7644865, 35.6811398))
-                .zoom(14.0)
-                .build()
-        )
-
-        mapView.gestures.addOnMoveListener(object : OnMoveListener {
-            override fun onMove(detector: MoveGestureDetector): Boolean { return false }
-            override fun onMoveBegin(detector: MoveGestureDetector) { toggleCameraFollowingPosition(false) }
-            override fun onMoveEnd(detector: MoveGestureDetector) {}
-
-        })
+        initializeMapView()
 
         // set viewportDataSource, which tells the navigationCamera where to look
         viewportDataSource = MapboxNavigationViewportDataSource(mapView.mapboxMap)
@@ -156,29 +103,24 @@ class HarukaMapController (
         navigationCamera = NavigationCamera(mapView.mapboxMap, mapView.camera, viewportDataSource)
     }
 
-    fun lifecycleOnResume(owner: LifecycleOwner) {
-        MapboxNavigationApp.attach(owner)
-        MapboxNavigationApp.registerObserver(navigationObserver)
-        lifecycleScope = owner.lifecycle
+    private val routeLineApi: MapboxRouteLineApi by lazy {
+        MapboxRouteLineApi(MapboxRouteLineApiOptions.Builder()
+            .isRouteCalloutsEnabled(true)
+            .build())
     }
 
-    fun lifecycleOnPause(owner: LifecycleOwner) {
-        MapboxNavigationApp.detach(owner)
-        MapboxNavigationApp.registerObserver(navigationObserver)
-    }
+    private val routeLineView: MapboxRouteLineView by lazy {
+        val routeCalloutClickListener: ((CalloutClickData) -> Unit) = { data ->
+            reorderRoutes(data.route)
+        }
 
-    fun routeSearchOnClick() {
-        Log.d(TAG, "routeSearchOnClick is called.")
-        val lastLocation = locationObserver.lastLocation
-        navigationRoutePreviewRequest(listOf(
-            Point.fromLngLat(lastLocation.longitude, lastLocation.latitude),
-            Point.fromLngLat(139.6937075, 35.6820377)
-        ))
-        Log.d(TAG, "routeSearchOnClick is finished.")
-    }
-
-    fun toggleCameraFollowingPosition(isFollowing: Boolean) {
-        _isCameraFollowingPosition.value = isFollowing
+        MapboxRouteLineView(MapboxRouteLineViewOptions.Builder(context).build())
+            .also {
+                it.enableCallouts(
+                    mapView.viewAnnotationManager,
+                    DefaultRouteCalloutAdapter(context, routeCalloutClickListener = routeCalloutClickListener)
+                )
+            }
     }
 
     private val navigationObserver =
@@ -293,6 +235,78 @@ class HarukaMapController (
                 }
             }
         }
+
+    fun initializeMapView() {
+        mapView = MapView(context, mapInitOptions = MapInitOptions(context, styleUri = ""))
+
+        // Initialize location puck using navigationLocationProvider as its data source
+        mapView.location.apply {
+            setLocationProvider(navigationLocationProvider)
+            locationPuck = createDefault2DPuck()
+            puckBearingEnabled = true
+            enabled = true
+        }
+
+        mapView.scalebar.updateSettings {
+            position = Gravity.BOTTOM or Gravity.START
+            borderWidth = 4f
+            marginBottom = 80f
+        }
+
+        mapView.compass.updateSettings {
+            position = Gravity.TOP or Gravity.END
+            marginTop = 100f
+            marginRight = 50f
+            clickable = true
+        }
+
+        mapView.mapboxMap.setCamera(
+            CameraOptions.Builder()
+                .center(Point.fromLngLat(139.7644865, 35.6811398))
+                .zoom(14.0)
+                .build()
+        )
+
+        mapView.gestures.addOnMoveListener(object : OnMoveListener {
+            override fun onMove(detector: MoveGestureDetector): Boolean { return false }
+            override fun onMoveBegin(detector: MoveGestureDetector) { toggleCameraFollowingPosition(false) }
+            override fun onMoveEnd(detector: MoveGestureDetector) {}
+        })
+    }
+
+    fun lifecycleOnResume(owner: LifecycleOwner) {
+        MapboxNavigationApp.attach(owner)
+        MapboxNavigationApp.registerObserver(navigationObserver)
+        lifecycleScope = owner.lifecycle
+    }
+
+    fun lifecycleOnPause(owner: LifecycleOwner) {
+        MapboxNavigationApp.detach(owner)
+        MapboxNavigationApp.registerObserver(navigationObserver)
+    }
+
+    fun routeSearchOnClick() {
+        Log.d(TAG, "routeSearchOnClick is called.")
+        val lastLocation = locationObserver.lastLocation
+        navigationRoutePreviewRequest(listOf(
+            Point.fromLngLat(lastLocation.longitude, lastLocation.latitude),
+            Point.fromLngLat(139.6937075, 35.6820377)
+        ))
+        Log.d(TAG, "routeSearchOnClick is finished.")
+    }
+
+    fun toggleCameraFollowingPosition(isFollowing: Boolean) {
+        _isCameraFollowingPosition.value = isFollowing
+    }
+
+    fun startNavigation() {
+        Log.d(TAG, "startNavigation is called.")
+        val routes = navigation.getNavigationRoutes()
+        if (routes.isNotEmpty()) {
+            navigation.setNavigationRoutes(navigation.getNavigationRoutes())
+            toggleCameraFollowingPosition(true)
+        }
+    }
 
     @OptIn(MapboxDelicateApi::class)
     private fun navigationRoutePreviewRequest(coordinates: List<Point>) {
