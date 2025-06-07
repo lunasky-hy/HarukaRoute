@@ -311,14 +311,19 @@ class HarukaMapController (
         MapboxNavigationApp.registerObserver(navigationObserver)
     }
 
-    fun routeSearchOnClick() {
+    fun routePreviewRequest(distination: Point) {
         Log.d(TAG, "routeSearchOnClick is called.")
         val lastLocation = locationObserver.lastLocation
         navigationRoutePreviewRequest(listOf(
             Point.fromLngLat(lastLocation.longitude, lastLocation.latitude),
-            Point.fromLngLat(139.6937075, 35.6820377)
+            distination
         ))
         Log.d(TAG, "routeSearchOnClick is finished.")
+    }
+
+    fun routePreviewClose() {
+        navigation.setRoutesPreview(emptyList())
+        Log.d(TAG, "routePreviewClose is called. ${navigation.getRoutesPreview()}")
     }
 
     fun toggleCameraFollowingPosition(isFollowing: Boolean) {
@@ -381,7 +386,6 @@ class HarukaMapController (
                         mapView.camera.easeTo(overviewOption, animOption)
 
                         navigation.setRoutesPreview(routes)
-//                        navigation.setNavigationRoutes(routes)
                         Log.d(TAG, "navigationRoutePreviewRequest NavigationRouterCallback.onRoutesReady is completed.")
                     }
                 }

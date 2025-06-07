@@ -12,7 +12,6 @@ import com.lunaskyhy.harukaroute.map.MapControllerProvider
 import com.lunaskyhy.harukaroute.ui.AppViewModelProvider
 import com.lunaskyhy.harukaroute.ui.screen.navigation.freedrive.FreeDriveLayout
 import com.lunaskyhy.harukaroute.ui.screen.navigation.guidance.ActiveGuidanceLayout
-import com.lunaskyhy.harukaroute.ui.screen.navigation.shared.ActionButtons
 import com.lunaskyhy.harukaroute.ui.theme.AppTheme
 import com.mapbox.navigation.core.trip.session.NavigationSessionState
 
@@ -22,7 +21,6 @@ fun NavigationScreen(
     viewModel: NavigationScreenViewModel = viewModel(factory = AppViewModelProvider.viewModelFactory),
     mapController: HarukaMapController = MapControllerProvider.harukaMapController
 ) {
-    val isCameraFollowingPosition = mapController.isCameraFollowingPosition.collectAsState()
     val navigationState = mapController.navigationState.collectAsState()
 
     NavigationScreenLayout(
@@ -36,8 +34,6 @@ fun NavigationScreenLayout(
     navigationState: NavigationSessionState = NavigationSessionState.Idle,
 ) { // Box全体を画面いっぱいに広げる
     Box(modifier = modifier.fillMaxSize()) {
-        ActionButtons()
-
         when(navigationState) {
             is NavigationSessionState.ActiveGuidance -> ActiveGuidanceLayout()
             is NavigationSessionState.FreeDrive -> FreeDriveLayout()

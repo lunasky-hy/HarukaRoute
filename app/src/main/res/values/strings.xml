@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">HarukaRoute</string>
     <string name="destination_search_input_label">どこに行く？</string>
+    <string name="navigation_start_button_label">ナビ開始</string>
+    <string name="route_preview_button_label">経路</string>
+    <string name="place_preview_cancel_button_label">戻る</string>
 </resources>
