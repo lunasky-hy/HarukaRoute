@@ -57,6 +57,7 @@ import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineApi
 import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineView
 import com.mapbox.navigation.ui.maps.route.line.model.MapboxRouteLineApiOptions
 import com.mapbox.navigation.ui.maps.route.line.model.MapboxRouteLineViewOptions
+import com.mapbox.search.autocomplete.PlaceAutocomplete
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -82,6 +83,8 @@ class HarukaMapController (
 
     private val _navigationSessionState = MutableStateFlow<NavigationSessionState>(NavigationSessionState.Idle)
     val navigationState = _navigationSessionState.asStateFlow()
+
+    val placeAutocomplete = PlaceAutocomplete.create()
 
     init {
         if (!MapboxNavigationApp.isSetup()) {
@@ -257,7 +260,6 @@ class HarukaMapController (
         override fun onNextRouteLegStart(routeLegProgress: RouteLegProgress) {}
         override fun onWaypointArrival(routeProgress: RouteProgress) {}
     }
-
 
     fun initializeMapView() {
         mapView = MapView(context, mapInitOptions = MapInitOptions(context))

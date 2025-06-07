@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">HarukaRoute</string>
-    <string name="destination_search_input_label">検索...</string>
+    <string name="destination_search_input_label">どこに行く？</string>
 </resources>
