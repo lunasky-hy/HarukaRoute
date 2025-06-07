@@ -16,7 +16,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.lunaskyhy.harukaroute.map.HarukaMapController
 import com.lunaskyhy.harukaroute.map.MapControllerProvider
-import com.lunaskyhy.harukaroute.ui.freedrive.FreeDriveScreen
+import com.lunaskyhy.harukaroute.ui.screen.navigation.FreeDriveScreen
 
 @Composable
 fun MapOverlayScreen(

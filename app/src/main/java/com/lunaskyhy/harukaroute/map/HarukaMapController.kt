@@ -33,14 +33,19 @@ import com.mapbox.navigation.base.options.NavigationOptions
 import com.mapbox.navigation.base.route.NavigationRoute
 import com.mapbox.navigation.base.route.NavigationRouterCallback
 import com.mapbox.navigation.base.route.RouterFailure
+import com.mapbox.navigation.base.trip.model.RouteLegProgress
+import com.mapbox.navigation.base.trip.model.RouteProgress
 import com.mapbox.navigation.base.trip.model.RouteProgressState
 import com.mapbox.navigation.core.MapboxNavigation
+import com.mapbox.navigation.core.arrival.ArrivalObserver
 import com.mapbox.navigation.core.directions.session.RoutesObserver
 import com.mapbox.navigation.core.lifecycle.MapboxNavigationApp
 import com.mapbox.navigation.core.lifecycle.MapboxNavigationObserver
 import com.mapbox.navigation.core.preview.RoutesPreviewObserver
 import com.mapbox.navigation.core.trip.session.LocationMatcherResult
 import com.mapbox.navigation.core.trip.session.LocationObserver
+import com.mapbox.navigation.core.trip.session.NavigationSessionState
+import com.mapbox.navigation.core.trip.session.NavigationSessionStateObserver
 import com.mapbox.navigation.core.trip.session.RouteProgressObserver
 import com.mapbox.navigation.ui.maps.camera.NavigationCamera
 import com.mapbox.navigation.ui.maps.camera.data.MapboxNavigationViewportDataSource
@@ -71,8 +76,12 @@ class HarukaMapController (
     private var viewportDataSource: MapboxNavigationViewportDataSource
     private var navigationCamera: NavigationCamera
     val navigationLocationProvider = NavigationLocationProvider()
+
     private val _isCameraFollowingPosition = MutableStateFlow(true)
     var isCameraFollowingPosition: StateFlow<Boolean> = _isCameraFollowingPosition.asStateFlow()
+
+    private val _navigationSessionState = MutableStateFlow<NavigationSessionState>(NavigationSessionState.Idle)
+    val navigationState = _navigationSessionState.asStateFlow()
 
     init {
         if (!MapboxNavigationApp.isSetup()) {
@@ -123,6 +132,9 @@ class HarukaMapController (
             }
     }
 
+    private val navigationStateObserver =
+        NavigationSessionStateObserver { navigationSession -> _navigationSessionState.value = navigationSession }
+
     private val navigationObserver =
         object : MapboxNavigationObserver {
             private val mutableLocation = MutableStateFlow<LocationMatcherResult?>(null)
@@ -137,7 +149,9 @@ class HarukaMapController (
                 mapboxNavigation.registerLocationObserver(locationObserver)
                 mapboxNavigation.registerRoutesObserver(routesObserver)
                 mapboxNavigation.registerRouteProgressObserver(routeProgressObserver)
+                mapboxNavigation.registerArrivalObserver(arrivalObserver)
                 mapboxNavigation.registerRoutesPreviewObserver(routesPreviewObserver)
+                mapboxNavigation.registerNavigationSessionStateObserver(navigationStateObserver)
 
                 mapboxNavigation.startTripSession()
 
@@ -150,7 +164,9 @@ class HarukaMapController (
                 mapboxNavigation.unregisterLocationObserver(locationObserver)
                 mapboxNavigation.unregisterRoutesObserver(routesObserver)
                 mapboxNavigation.unregisterRouteProgressObserver(routeProgressObserver)
+                mapboxNavigation.unregisterArrivalObserver(arrivalObserver)
                 mapboxNavigation.unregisterRoutesPreviewObserver(routesPreviewObserver)
+                mapboxNavigation.unregisterNavigationSessionStateObserver(navigationStateObserver)
 
                 Log.d(TAG, "navigationObserver onDetached is completed.")
             }
@@ -235,6 +251,13 @@ class HarukaMapController (
                 }
             }
         }
+
+    private val arrivalObserver = object : ArrivalObserver {
+        override fun onFinalDestinationArrival(routeProgress: RouteProgress) {}
+        override fun onNextRouteLegStart(routeLegProgress: RouteLegProgress) {}
+        override fun onWaypointArrival(routeProgress: RouteProgress) {}
+    }
+
 
     fun initializeMapView() {
         mapView = MapView(context, mapInitOptions = MapInitOptions(context, styleUri = ""))

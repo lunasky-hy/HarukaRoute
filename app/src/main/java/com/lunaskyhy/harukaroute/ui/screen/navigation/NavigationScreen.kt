@@ -1,4 +1,4 @@
-package com.lunaskyhy.harukaroute.ui.freedrive
+package com.lunaskyhy.harukaroute.ui.screen.navigation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,7 +28,7 @@ import com.lunaskyhy.harukaroute.ui.theme.AppTheme
 @Composable
 fun FreeDriveScreen(
     modifier: Modifier = Modifier,
-    viewModel: FreeDriveViewModel = viewModel(factory = AppViewModelProvider.viewModelFactory),
+    viewModel: NavigationScreenViewModel = viewModel(factory = AppViewModelProvider.viewModelFactory),
     mapController: HarukaMapController = MapControllerProvider.harukaMapController
 ) {
     val isCameraFollowingPosition = mapController.isCameraFollowingPosition.collectAsState()
