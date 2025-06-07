@@ -260,7 +260,8 @@ class HarukaMapController (
 
 
     fun initializeMapView() {
-        mapView = MapView(context, mapInitOptions = MapInitOptions(context, styleUri = ""))
+        mapView = MapView(context, mapInitOptions = MapInitOptions(context))
+//        mapView = MapView(context, mapInitOptions = MapInitOptions(context, styleUri = ""))
 
         // Initialize location puck using navigationLocationProvider as its data source
         mapView.location.apply {
