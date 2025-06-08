@@ -14,6 +14,7 @@ import com.mapbox.common.location.Location
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.EdgeInsets
+import com.mapbox.maps.ImageHolder
 import com.mapbox.maps.MapInitOptions
 import com.mapbox.maps.MapView
 import com.mapbox.maps.MapboxDelicateApi
@@ -24,7 +25,6 @@ import com.mapbox.maps.plugin.animation.easeTo
 import com.mapbox.maps.plugin.compass.compass
 import com.mapbox.maps.plugin.gestures.OnMoveListener
 import com.mapbox.maps.plugin.gestures.gestures
-import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
 import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.plugin.scalebar.scalebar
 import com.mapbox.navigation.base.ExperimentalPreviewMapboxNavigationAPI
@@ -252,9 +252,6 @@ class HarukaMapController (
                     RouteProgressState.OFF_ROUTE -> Log.d(TAG, "R.drawable.your_drawable_for_off_route_state")
                     RouteProgressState.UNCERTAIN -> Log.d(TAG, "R.drawable.your_drawable_for_uncertain_state")
                 }
-                mapView.location.apply {
-                    this.locationPuck = LocationPuck2D()
-                }
             }
         }
 
@@ -271,7 +268,9 @@ class HarukaMapController (
         // Initialize location puck using navigationLocationProvider as its data source
         mapView.location.apply {
             setLocationProvider(navigationLocationProvider)
-            locationPuck = createDefault2DPuck()
+            locationPuck = LocationPuck2D(
+                bearingImage = ImageHolder.Companion.from(com.mapbox.navigation.ui.components.R.drawable.mapbox_navigation_puck_icon)
+            )
             puckBearingEnabled = true
             enabled = true
         }
