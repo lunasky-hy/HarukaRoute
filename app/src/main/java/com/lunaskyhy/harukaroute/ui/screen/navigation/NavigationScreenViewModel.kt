@@ -59,13 +59,13 @@ class NavigationScreenViewModel(
         val destination = suggestion.routablePoints?.first()?.point
         if (destination != null) {
             mapController.routePreviewRequest(destination)
-            _uiState.value = _uiState.value.copy(previewPoint = destination)
+            _uiState.value = _uiState.value.copy(previewRouteSuggestion = destination)
         }
     }
 
     fun previewRouteClose() {
         mapController.routePreviewClose()
-        _uiState.value = _uiState.value.copy(previewPoint = null)
+        _uiState.value = _uiState.value.copy(previewRouteSuggestion = null)
     }
 
     private fun placeAutocomplete() {
@@ -83,5 +83,5 @@ data class NavigationScreenUiState(
     val isSearchActive: Boolean = false,
     val placeSuggestions: List<PlaceAutocompleteSuggestion> = emptyList(),
     val selectedSuggestion: PlaceAutocompleteResult? = null,
-    val previewPoint: Point? = null
+    val previewRouteSuggestion: Point? = null
 )

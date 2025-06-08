@@ -26,7 +26,7 @@ fun FreeDriveLayout(
     val isCameraFollowingPosition = mapController.isCameraFollowingPosition.collectAsState()
 
     Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.TopEnd) {
-        if (uiState.value.previewPoint != null) {
+        if (uiState.value.previewRouteSuggestion != null) {
             PreviewRouteOverlay()
         } else if (uiState.value.selectedSuggestion != null) {
             PlaceDetailOverlay()

@@ -26,6 +26,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lunaskyhy.harukaroute.R
+import com.lunaskyhy.harukaroute.map.HarukaMapController
+import com.lunaskyhy.harukaroute.map.MapControllerProvider
 import com.lunaskyhy.harukaroute.ui.AppViewModelProvider
 import com.lunaskyhy.harukaroute.ui.screen.navigation.NavigationScreenViewModel
 import com.lunaskyhy.harukaroute.ui.screen.navigation.shared.component.DisplayDistance
@@ -35,6 +37,7 @@ import com.lunaskyhy.harukaroute.ui.theme.AppTheme
 @Composable
 fun PlaceDetailOverlay(
     modifier: Modifier = Modifier,
+    mapController: HarukaMapController = MapControllerProvider.harukaMapController,
     viewModel: NavigationScreenViewModel = viewModel(factory = AppViewModelProvider.viewModelFactory)
 ) {
     val uiState = viewModel.uiState.collectAsState()
@@ -45,6 +48,7 @@ fun PlaceDetailOverlay(
         address = uiState.value.selectedSuggestion?.address?.formattedAddress ?: "",
         distance = uiState.value.selectedSuggestion?.distanceMeters,
         etaMinutes = uiState.value.selectedSuggestion?.etaMinutes?.toInt(),
+        onNavigate = { mapController.startNavigation() },
         onPreviewRoute = { viewModel.previewRouteSuggestion(uiState.value.selectedSuggestion!!) },
         onCancel = viewModel::unselectDetailSuggestion,
     )

@@ -20,6 +20,7 @@ import com.mapbox.maps.MapboxDelicateApi
 import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.animation.camera
+import com.mapbox.maps.plugin.animation.easeTo
 import com.mapbox.maps.plugin.compass.compass
 import com.mapbox.maps.plugin.gestures.OnMoveListener
 import com.mapbox.maps.plugin.gestures.gestures
@@ -57,6 +58,7 @@ import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineApi
 import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineView
 import com.mapbox.navigation.ui.maps.route.line.model.MapboxRouteLineApiOptions
 import com.mapbox.navigation.ui.maps.route.line.model.MapboxRouteLineViewOptions
+import com.mapbox.navigation.utils.internal.toPoint
 import com.mapbox.search.autocomplete.PlaceAutocomplete
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -171,6 +173,8 @@ class HarukaMapController (
                 mapboxNavigation.unregisterRoutesPreviewObserver(routesPreviewObserver)
                 mapboxNavigation.unregisterNavigationSessionStateObserver(navigationStateObserver)
 
+                routeLineView.cancel()
+                routeLineApi.cancel()
                 Log.d(TAG, "navigationObserver onDetached is completed.")
             }
         }
@@ -202,7 +206,7 @@ class HarukaMapController (
                 navigationCamera.requestNavigationCameraToFollowing()
 
                 if (_isCameraFollowingPosition.value) {
-                    mapView.mapboxMap.setCamera(
+                    mapView.mapboxMap.easeTo(
                         CameraOptions.Builder()
                             .center(
                                 Point.fromLngLat(
@@ -236,6 +240,8 @@ class HarukaMapController (
 
                 // set the navigationCamera to OVERVIEW
                 navigationCamera.requestNavigationCameraToOverview()
+            } else {
+
             }
         }
 
@@ -323,6 +329,12 @@ class HarukaMapController (
 
     fun routePreviewClose() {
         navigation.setRoutesPreview(emptyList())
+        routeLineApi.clearRouteLine { expect ->
+            routeLineView.renderClearRouteLineValue(
+                mapView.mapboxMap.style!!,
+                expect
+            )
+        }
         Log.d(TAG, "routePreviewClose is called. ${navigation.getRoutesPreview()}")
     }
 
@@ -371,19 +383,10 @@ class HarukaMapController (
                         Log.d(TAG, "route : $it")
                     }
                     if (routes.isNotEmpty()) {
-                        val overviewOption = mapView.mapboxMap
-                            .cameraForCoordinates(
-                                coordinates,
-                                CameraOptions.Builder()
-                                    .padding(EdgeInsets(100.0, 100.0, 100.0, 100.0))
-                                    .build(),
-                                null,
-                                null,
-                                null
-                            )
-                        val animOption = MapAnimationOptions.Builder().duration(1500L).build()
-
-                        mapView.camera.easeTo(overviewOption, animOption)
+                        routePreviewCamera(
+                            originPoint = locationObserver.lastLocation.toPoint(),
+                            destinationPoint = coordinates.last()
+                        )
 
                         navigation.setRoutesPreview(routes)
                         Log.d(TAG, "navigationRoutePreviewRequest NavigationRouterCallback.onRoutesReady is completed.")
@@ -425,5 +428,27 @@ class HarukaMapController (
                 navigation.changeRoutesPreviewPrimaryRoute(clickedRoute)
             }
         }
+    }
+
+    @OptIn(MapboxDelicateApi::class)
+    private fun routePreviewCamera(originPoint: Point, destinationPoint: Point) {
+        val mapAnimationOptions = MapAnimationOptions.Builder().duration(1500L).build()
+        val overviewOption = mapView.mapboxMap.cameraForCoordinates(
+            listOf(
+                originPoint,
+                destinationPoint
+            ),
+            CameraOptions.Builder()
+                .padding(EdgeInsets(100.0, 100.0, 100.0, 100.0))
+                .build(),
+            null,
+            null,
+            null,
+        )
+
+        mapView.camera.easeTo(
+            overviewOption,
+            mapAnimationOptions
+        )
     }
 }
