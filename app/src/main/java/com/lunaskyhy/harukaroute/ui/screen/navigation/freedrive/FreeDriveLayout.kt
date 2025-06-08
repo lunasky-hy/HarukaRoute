@@ -12,8 +12,8 @@ import com.lunaskyhy.harukaroute.map.MapControllerProvider
 import com.lunaskyhy.harukaroute.ui.AppViewModelProvider
 import com.lunaskyhy.harukaroute.ui.screen.navigation.NavigationScreenViewModel
 import com.lunaskyhy.harukaroute.ui.screen.navigation.shared.ActionButtons
+import com.lunaskyhy.harukaroute.ui.screen.navigation.shared.NavigationRoutePreviewOverlay
 import com.lunaskyhy.harukaroute.ui.screen.navigation.shared.PlaceDetailOverlay
-import com.lunaskyhy.harukaroute.ui.screen.navigation.shared.PreviewRouteOverlay
 import com.lunaskyhy.harukaroute.ui.screen.navigation.shared.SearchPlaceOverlay
 
 @Composable
@@ -27,7 +27,7 @@ fun FreeDriveLayout(
 
     Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.TopEnd) {
         if (uiState.value.previewRouteSuggestion != null) {
-            PreviewRouteOverlay()
+            NavigationRoutePreviewOverlay()
         } else if (uiState.value.selectedSuggestion != null) {
             PlaceDetailOverlay()
         } else if (uiState.value.isSearchActive) {

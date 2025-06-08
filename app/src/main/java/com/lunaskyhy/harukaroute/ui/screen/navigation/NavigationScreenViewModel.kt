@@ -68,6 +68,15 @@ class NavigationScreenViewModel(
         _uiState.value = _uiState.value.copy(previewRouteSuggestion = null)
     }
 
+    fun startNavigationWithoutPreview(suggestion: PlaceAutocompleteResult) {
+        Log.d(TAG, "previewRouteSuggestion: $suggestion")
+
+        val destination = suggestion.routablePoints?.first()?.point
+        if (destination != null) {
+            mapController.startNavigationWithoutRoutePreview(destination)
+        }
+    }
+
     private fun placeAutocomplete() {
         viewModelScope.launch {
             val response = mapController.placeAutocomplete.suggestions(query = searchQuery)

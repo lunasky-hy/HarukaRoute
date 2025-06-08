@@ -157,8 +157,7 @@ class HarukaMapController (
                 mapboxNavigation.registerArrivalObserver(arrivalObserver)
                 mapboxNavigation.registerRoutesPreviewObserver(routesPreviewObserver)
                 mapboxNavigation.registerNavigationSessionStateObserver(navigationStateObserver)
-
-                mapboxNavigation.startTripSession()
+                navigation.startTripSession()
 
                 Log.d(TAG, "navigationObserver onAttached is completed.")
             }
@@ -240,8 +239,6 @@ class HarukaMapController (
 
                 // set the navigationCamera to OVERVIEW
                 navigationCamera.requestNavigationCameraToOverview()
-            } else {
-
             }
         }
 
@@ -317,12 +314,16 @@ class HarukaMapController (
         MapboxNavigationApp.registerObserver(navigationObserver)
     }
 
-    fun routePreviewRequest(distination: Point) {
+    fun toggleCameraFollowingPosition(isFollowing: Boolean) {
+        _isCameraFollowingPosition.value = isFollowing
+    }
+
+    fun routePreviewRequest(destination: Point) {
         Log.d(TAG, "routeSearchOnClick is called.")
         val lastLocation = locationObserver.lastLocation
         navigationRoutePreviewRequest(listOf(
             Point.fromLngLat(lastLocation.longitude, lastLocation.latitude),
-            distination
+            destination
         ))
         Log.d(TAG, "routeSearchOnClick is finished.")
     }
@@ -334,25 +335,34 @@ class HarukaMapController (
                 mapView.mapboxMap.style!!,
                 expect
             )
+            toggleCameraFollowingPosition(true)
         }
         Log.d(TAG, "routePreviewClose is called. ${navigation.getRoutesPreview()}")
     }
 
-    fun toggleCameraFollowingPosition(isFollowing: Boolean) {
-        _isCameraFollowingPosition.value = isFollowing
+    fun startNavigationWithoutRoutePreview(destination: Point) {
+        Log.d(TAG, "startNavigation is called.")
+        val lastLocation = locationObserver.lastLocation
+        navigationRoutePreviewRequest(listOf(
+            Point.fromLngLat(lastLocation.longitude, lastLocation.latitude),
+            destination
+        ), true)
+        toggleCameraFollowingPosition(true)
     }
 
     fun startNavigation() {
         Log.d(TAG, "startNavigation is called.")
-        val routes = navigation.getNavigationRoutes()
-        if (routes.isNotEmpty()) {
-            navigation.setNavigationRoutes(navigation.getNavigationRoutes())
+        val routes = navigation.getRoutesPreview()
+        if (routes != null) {
+            navigation.setNavigationRoutes(routes.routesList)
             toggleCameraFollowingPosition(true)
+        } else {
+            Log.d(TAG, "navigation.getNavigationRoutes is empty.")
         }
     }
 
     @OptIn(MapboxDelicateApi::class)
-    private fun navigationRoutePreviewRequest(coordinates: List<Point>) {
+    private fun navigationRoutePreviewRequest(coordinates: List<Point>, startNavigation: Boolean = false) {
         Log.d(TAG, "navigationRoutePreviewRequest is called.")
 
         navigation.requestRoutes(
@@ -388,7 +398,12 @@ class HarukaMapController (
                             destinationPoint = coordinates.last()
                         )
 
-                        navigation.setRoutesPreview(routes)
+                        if (startNavigation) {
+                            navigation.setNavigationRoutes(routes)
+                            toggleCameraFollowingPosition(true)
+                        } else {
+                            navigation.setRoutesPreview(routes)
+                        }
                         Log.d(TAG, "navigationRoutePreviewRequest NavigationRouterCallback.onRoutesReady is completed.")
                     }
                 }
@@ -445,6 +460,7 @@ class HarukaMapController (
             null,
             null,
         )
+        toggleCameraFollowingPosition(false)
 
         mapView.camera.easeTo(
             overviewOption,

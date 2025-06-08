@@ -42,20 +42,20 @@ fun PlaceDetailOverlay(
 ) {
     val uiState = viewModel.uiState.collectAsState()
 
-    PlacePreview(
+    PlaceDetailLayout(
         modifier = modifier,
         placeName = uiState.value.selectedSuggestion!!.name,
         address = uiState.value.selectedSuggestion?.address?.formattedAddress ?: "",
         distance = uiState.value.selectedSuggestion?.distanceMeters,
         etaMinutes = uiState.value.selectedSuggestion?.etaMinutes?.toInt(),
-        onNavigate = { mapController.startNavigation() },
+        onNavigate = { viewModel.startNavigationWithoutPreview(uiState.value.selectedSuggestion!!) },
         onPreviewRoute = { viewModel.previewRouteSuggestion(uiState.value.selectedSuggestion!!) },
         onCancel = viewModel::unselectDetailSuggestion,
     )
 }
 
 @Composable
-fun PlacePreview(
+fun PlaceDetailLayout(
     modifier: Modifier = Modifier,
     placeName: String = "",
     address: String = "",
@@ -171,7 +171,7 @@ fun PlaceDetailPreview() {
                 .padding(dimensionResource(R.dimen.padding_small))
                 .background(MaterialTheme.colorScheme.inverseOnSurface)
         ) {
-            PlacePreview(
+            PlaceDetailLayout(
                 placeName = "渋谷駅",
                 address = "東京都千代田区外神田１－１７, 千代田区, Tokyo 101-0021, 日本",
                 distance = 1241.2
