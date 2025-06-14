@@ -1,4 +1,4 @@
-package com.lunaskyhy.harukaroute.ui.screen.navigation.shared
+package com.lunaskyhy.harukaroute.ui.screen.navigation.freedrive
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
@@ -144,7 +144,6 @@ fun SearchPlaceSuggestion(
         }
     }
 }
-
 
 data class SuggestionPlaceItem(
     val name: String = "",

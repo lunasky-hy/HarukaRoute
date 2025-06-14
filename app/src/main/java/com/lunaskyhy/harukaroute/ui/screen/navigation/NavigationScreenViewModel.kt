@@ -20,7 +20,7 @@ const val TAG = "NavigationScreenViewModel"
 class NavigationScreenViewModel(
     private val mapController: HarukaMapController = MapControllerProvider.harukaMapController
 ): ViewModel() {
-    private val _uiState = MutableStateFlow(NavigationScreenUiState())
+    private val _uiState = MutableStateFlow(NavigationScreenState())
     val uiState = _uiState.asStateFlow()
 
     var searchQuery: String by mutableStateOf("")
@@ -88,9 +88,15 @@ class NavigationScreenViewModel(
     }
 }
 
-data class NavigationScreenUiState(
+data class NavigationScreenState(
     val isSearchActive: Boolean = false,
     val placeSuggestions: List<PlaceAutocompleteSuggestion> = emptyList(),
     val selectedSuggestion: PlaceAutocompleteResult? = null,
     val previewRouteSuggestion: Point? = null
 )
+
+sealed class FreeDriveUiState {
+    object SearchLocation: FreeDriveUiState()
+    data class PlaceDetail(val place: PlaceAutocompleteResult): FreeDriveUiState()
+    data class PreviewRoute(val destination: Point): FreeDriveUiState()
+}

@@ -11,10 +11,7 @@ import com.lunaskyhy.harukaroute.map.HarukaMapController
 import com.lunaskyhy.harukaroute.map.MapControllerProvider
 import com.lunaskyhy.harukaroute.ui.AppViewModelProvider
 import com.lunaskyhy.harukaroute.ui.screen.navigation.NavigationScreenViewModel
-import com.lunaskyhy.harukaroute.ui.screen.navigation.shared.ActionButtons
-import com.lunaskyhy.harukaroute.ui.screen.navigation.shared.NavigationRoutePreviewOverlay
-import com.lunaskyhy.harukaroute.ui.screen.navigation.shared.PlaceDetailOverlay
-import com.lunaskyhy.harukaroute.ui.screen.navigation.shared.SearchPlaceOverlay
+import com.lunaskyhy.harukaroute.ui.screen.navigation.shared.component.ActionButtons
 
 @Composable
 fun FreeDriveLayout(
@@ -26,18 +23,17 @@ fun FreeDriveLayout(
     val isCameraFollowingPosition = mapController.isCameraFollowingPosition.collectAsState()
 
     Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.TopEnd) {
+        ActionButtons(
+            isCameraFollowingPosition = !isCameraFollowingPosition.value,
+            followCameraOnClick = { mapController.toggleCameraFollowingPosition(true) }
+        )
+
         if (uiState.value.previewRouteSuggestion != null) {
             NavigationRoutePreviewOverlay()
         } else if (uiState.value.selectedSuggestion != null) {
             PlaceDetailOverlay()
-        } else if (uiState.value.isSearchActive) {
-            SearchPlaceOverlay()
         } else {
-            ActionButtons(
-                isCameraFollowingPosition = !isCameraFollowingPosition.value,
-                toggleSearchActive = viewModel::toggleSearchActive,
-                followCameraOnClick = { mapController.toggleCameraFollowingPosition(true) }
-            )
+            SearchPlaceOverlay()
         }
     }
 }

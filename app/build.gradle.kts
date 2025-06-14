@@ -49,6 +49,8 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.material.icon.core)
+    implementation(libs.androidx.material.icon.extended)
     implementation(libs.androidx.app)
     implementation(libs.androidx.gms.location)
     implementation(libs.androidx.ui.text.google.fonts)

@@ -1,4 +1,4 @@
-package com.lunaskyhy.harukaroute.ui.screen.navigation.shared
+package com.lunaskyhy.harukaroute.ui.screen.navigation.freedrive
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
