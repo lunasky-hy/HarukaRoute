@@ -1,4 +1,4 @@
-package com.lunaskyhy.carapp.screen
+package com.lunaskyhy.carapp.place
 
 import android.text.Spannable
 import android.text.SpannableString
@@ -16,7 +16,7 @@ import androidx.car.app.model.Row
 import androidx.car.app.model.Template
 import com.lunaskyhy.data.PlacesRepository
 
-class MainScreen(carContext: CarContext): Screen(carContext) {
+class PlaceScreen(carContext: CarContext): Screen(carContext) {
     override fun onGetTemplate(): Template {
         val placesRepository = PlacesRepository()
         val itemListBuilder = ItemList.Builder()
