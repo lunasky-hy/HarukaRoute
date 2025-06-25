@@ -1,4 +1,4 @@
-package com.lunaskyhy.harukaroute.ui.screen.navigation.freedrive
+package com.lunaskyhy.harukaroute.ui.screen.navigation.freedrive.overlay
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,7 +18,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -40,18 +39,18 @@ fun PlaceDetailOverlay(
     mapController: HarukaMapController = MapControllerProvider.harukaMapController,
     viewModel: NavigationScreenViewModel = viewModel(factory = AppViewModelProvider.viewModelFactory)
 ) {
-    val uiState = viewModel.uiState.collectAsState()
+//    val uiState = viewModel.uiState.collectAsState()
 
-    PlaceDetailLayout(
-        modifier = modifier,
-        placeName = uiState.value.selectedSuggestion!!.name,
-        address = uiState.value.selectedSuggestion?.address?.formattedAddress ?: "",
-        distance = uiState.value.selectedSuggestion?.distanceMeters,
-        etaMinutes = uiState.value.selectedSuggestion?.etaMinutes?.toInt(),
-        onNavigate = { viewModel.startNavigationWithoutPreview(uiState.value.selectedSuggestion!!) },
-        onPreviewRoute = { viewModel.previewRouteSuggestion(uiState.value.selectedSuggestion!!) },
-        onCancel = viewModel::unselectDetailSuggestion,
-    )
+//    PlaceDetailLayout(
+//        modifier = modifier,
+//        placeName = uiState.value.selectedSuggestion!!.name,
+//        address = uiState.value.selectedSuggestion?.address?.formattedAddress ?: "",
+//        distance = uiState.value.selectedSuggestion?.distanceMeters,
+//        etaMinutes = uiState.value.selectedSuggestion?.etaMinutes?.toInt(),
+//        onNavigate = { viewModel.startNavigationWithoutPreview(uiState.value.selectedSuggestion!!) },
+//        onPreviewRoute = { viewModel.previewRouteSuggestion(uiState.value.selectedSuggestion!!) },
+//        onCancel = viewModel::unselectDetailSuggestion,
+//    )
 }
 
 @Composable

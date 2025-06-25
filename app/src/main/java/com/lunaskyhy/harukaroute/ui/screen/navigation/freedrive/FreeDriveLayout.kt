@@ -10,7 +10,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lunaskyhy.harukaroute.map.HarukaMapController
 import com.lunaskyhy.harukaroute.map.MapControllerProvider
 import com.lunaskyhy.harukaroute.ui.AppViewModelProvider
+import com.lunaskyhy.harukaroute.ui.screen.navigation.FreeDriveUiState
 import com.lunaskyhy.harukaroute.ui.screen.navigation.NavigationScreenViewModel
+import com.lunaskyhy.harukaroute.ui.screen.navigation.freedrive.overlay.NavigationRoutePreviewOverlay
+import com.lunaskyhy.harukaroute.ui.screen.navigation.freedrive.overlay.PlaceDetailOverlay
+import com.lunaskyhy.harukaroute.ui.screen.navigation.freedrive.overlay.SearchPlaceOverlay
 import com.lunaskyhy.harukaroute.ui.screen.navigation.shared.component.ActionButtons
 
 @Composable
@@ -19,7 +23,7 @@ fun FreeDriveLayout(
     viewModel: NavigationScreenViewModel = viewModel(factory = AppViewModelProvider.viewModelFactory),
     mapController: HarukaMapController = MapControllerProvider.harukaMapController
 ) {
-    val uiState = viewModel.uiState.collectAsState()
+    val uiState = viewModel.uiState
     val isCameraFollowingPosition = mapController.isCameraFollowingPosition.collectAsState()
 
     Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.TopEnd) {
@@ -28,12 +32,10 @@ fun FreeDriveLayout(
             followCameraOnClick = { mapController.toggleCameraFollowingPosition(true) }
         )
 
-        if (uiState.value.previewRouteSuggestion != null) {
-            NavigationRoutePreviewOverlay()
-        } else if (uiState.value.selectedSuggestion != null) {
-            PlaceDetailOverlay()
-        } else {
-            SearchPlaceOverlay()
+        when(uiState) {
+            is FreeDriveUiState.PlaceDetail -> NavigationRoutePreviewOverlay()
+            is FreeDriveUiState.PreviewRoute -> PlaceDetailOverlay()
+            FreeDriveUiState.SearchLocation -> SearchPlaceOverlay()
         }
     }
 }

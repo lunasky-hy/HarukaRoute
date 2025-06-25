@@ -22,6 +22,7 @@ fun NavigationScreen(
     mapController: HarukaMapController = MapControllerProvider.harukaMapController
 ) {
     val navigationState = mapController.navigationState.collectAsState()
+    val navigate =
 
     NavigationScreenLayout(
         navigationState = navigationState.value,

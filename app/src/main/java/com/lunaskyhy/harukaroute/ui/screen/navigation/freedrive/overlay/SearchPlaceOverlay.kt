@@ -1,4 +1,4 @@
-package com.lunaskyhy.harukaroute.ui.screen.navigation.freedrive
+package com.lunaskyhy.harukaroute.ui.screen.navigation.freedrive.overlay
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
@@ -21,53 +22,36 @@ import androidx.compose.material3.CardColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lunaskyhy.harukaroute.R
-import com.lunaskyhy.harukaroute.map.HarukaMapController
-import com.lunaskyhy.harukaroute.map.MapControllerProvider
 import com.lunaskyhy.harukaroute.ui.AppViewModelProvider
 import com.lunaskyhy.harukaroute.ui.screen.navigation.NavigationScreenViewModel
 import com.lunaskyhy.harukaroute.ui.screen.navigation.shared.component.DisplayDistance
 import com.lunaskyhy.harukaroute.ui.screen.navigation.shared.component.DisplayEta
 import com.lunaskyhy.harukaroute.ui.theme.AppTheme
+import com.lunaskyhy.harukaroute.ui.theme.AppTypography
 
 @Composable
 fun SearchPlaceOverlay(
-    mapController: HarukaMapController = MapControllerProvider.harukaMapController,
     viewModel: NavigationScreenViewModel = viewModel(factory = AppViewModelProvider.viewModelFactory)
 ) {
-    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
 
-    SearchPlaceSuggestion(
+    SearchPlaceField(
         query = viewModel.searchQuery,
         onQueryChanged = viewModel::searchQueryChange,
-        onSearchCloseClicked = viewModel::toggleSearchActive,
-        suggestions = uiState.value.placeSuggestions.map {
-            SuggestionPlaceItem(
-                name = it.name,
-                distanceMeters = it.distanceMeters,
-                etaMinutes = it.etaMinutes?.toInt(),
-                suggestionsOnClicked = { viewModel.displayDetailSuggestion(it) }
-            )
-        }
+        onSearchCloseClicked = { viewModel.searchQueryChange("")},
+        suggestions = emptyList()
     )
 }
 
 @SuppressLint("DefaultLocale")
 @Composable
-fun SearchPlaceSuggestion(
+fun SearchPlaceField(
     modifier: Modifier = Modifier,
     query: String = "",
     onQueryChanged: (String) -> Unit = {},
@@ -86,57 +70,71 @@ fun SearchPlaceSuggestion(
             disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
         )
     ) {
-        Column(modifier = Modifier) {
-            TextField(
+        Column(
+            modifier = Modifier,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            BasicTextField(
                 value = query,
                 onValueChange = onQueryChanged,
-                placeholder = { Text(text = stringResource(R.string.destination_search_input_label)) },
-                leadingIcon = { Icon(Icons.Filled.Search, contentDescription = "Search Place") },
-                trailingIcon = { Icon(Icons.Filled.Close, contentDescription = "Close Search",
-                    modifier = Modifier.clickable { onSearchCloseClicked() })},
-                modifier = Modifier
-                    .padding(horizontal = dimensionResource(R.dimen.padding_medium))
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.surface,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surface
-                ))
+                textStyle = AppTypography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
+            ) { innerTextField ->
+                Row(
+                    modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium)),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Filled.Search,
+                        contentDescription = "Search Place",
+                        modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_small))
+                    )
+                    Box(modifier = Modifier.weight(1f)) {
+                        innerTextField()
+                    }
+                    if (query.isNotEmpty()) {
+                        Icon(Icons.Filled.Close, contentDescription = "Close Search",
+                            modifier = Modifier.clickable { onSearchCloseClicked() })
+                    }
+                }
+            }
 
-            LazyColumn(modifier = Modifier
-                .padding(top = dimensionResource(R.dimen.padding_small))
-                .heightIn(max = dimensionResource(R.dimen.place_suggestion_min_height))) {
-                items(suggestions) { item ->
-                    Box(modifier
-                        .padding(
-                            horizontal = dimensionResource(R.dimen.padding_medium_large)
-                        )
-                        .fillMaxWidth()
-                        .drawBehind {
-                            drawLine(
-                                color = Color(0xFFCCCCCC),
-                                start = Offset(0f, size.height - 1.dp.toPx() / 2),
-                                end = Offset(size.width, size.height - 1.dp.toPx() / 2),
-                                strokeWidth = 1.dp.toPx()
-                            )
+            if (suggestions.isNotEmpty()) {
+                SearchPlaceSuggestion(suggestions = suggestions)
+            }
+        }
+    }
+}
+
+@Composable
+fun SearchPlaceSuggestion(
+    modifier: Modifier = Modifier,
+    suggestions: List<SuggestionPlaceItem> = emptyList()
+) {
+    LazyColumn(modifier = modifier
+        .padding(bottom = dimensionResource(R.dimen.padding_medium))
+        .heightIn(max = dimensionResource(R.dimen.place_suggestion_min_height))
+    ) {
+        items(suggestions) { item ->
+            Box(modifier
+                .padding(horizontal = dimensionResource(R.dimen.padding_large))
+                .fillMaxWidth()
+                .clickable { item.suggestionsOnClicked() }
+            ) {
+                Column(modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_medium))) {
+                    Text(
+                        text = item.name,
+                        modifier = Modifier.fillMaxWidth(),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    Row {
+                        if (item.distanceMeters != null) {
+                            val distance = item.distanceMeters
+                            DisplayDistance(modifier = Modifier.weight(1f), distance = distance)
                         }
-                        .clickable { item.suggestionsOnClicked() }) {
-                        Column(modifier = Modifier.padding(vertical = dimensionResource(R.dimen.padding_medium))) {
-                            Text(
-                                text = item.name,
-                                modifier = Modifier.fillMaxWidth(),
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                            Row {
-                                if (item.distanceMeters != null) {
-                                    val distance = item.distanceMeters
-                                    DisplayDistance(modifier = Modifier.weight(1f), distance = distance)
-                                }
-                                if (item.etaMinutes != null) {
-                                    val etaMinutes = item.etaMinutes
-                                    DisplayEta(etaMinutes = etaMinutes)
-                                }
-                            }
+                        if (item.etaMinutes != null) {
+                            val etaMinutes = item.etaMinutes
+                            DisplayEta(etaMinutes = etaMinutes)
                         }
                     }
                 }
@@ -166,7 +164,7 @@ fun SearchPlaceSuggestionPreview() {
             .fillMaxSize()
             .padding(dimensionResource(R.dimen.padding_small))
             .background(MaterialTheme.colorScheme.inverseOnSurface)) {
-            SearchPlaceSuggestion(query = "Test", suggestions = suggestions)
+            SearchPlaceField(query = "Test", suggestions = suggestions)
         }
     }
 }
@@ -181,7 +179,7 @@ fun SearchPlacePreview() {
             .fillMaxSize()
             .padding(dimensionResource(R.dimen.padding_small))
             .background(MaterialTheme.colorScheme.inverseOnSurface)) {
-            SearchPlaceSuggestion(query = "", suggestions = suggestions)
+            SearchPlaceField(query = "", suggestions = suggestions)
         }
     }
 }

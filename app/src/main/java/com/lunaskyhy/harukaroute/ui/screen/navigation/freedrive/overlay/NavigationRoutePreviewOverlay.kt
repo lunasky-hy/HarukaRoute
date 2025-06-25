@@ -1,4 +1,4 @@
-package com.lunaskyhy.harukaroute.ui.screen.navigation.freedrive
+package com.lunaskyhy.harukaroute.ui.screen.navigation.freedrive.overlay
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,7 +11,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -28,22 +27,22 @@ fun NavigationRoutePreviewOverlay(
     mapController: HarukaMapController = MapControllerProvider.harukaMapController,
     viewModel: NavigationScreenViewModel = viewModel(factory = AppViewModelProvider.viewModelFactory)
 ) {
-    val uiState = viewModel.uiState.collectAsState()
+//    val uiState = viewModel.uiState.collectAsState()
 
     val onCancel = {
         viewModel.previewRouteClose()
         viewModel.unselectDetailSuggestion()
     }
 
-    NavigationRoutePreviewLayout(
-        modifier = modifier,
-        placeName = uiState.value.selectedSuggestion!!.name,
-        address = uiState.value.selectedSuggestion?.address?.formattedAddress ?: "",
-        distance = uiState.value.selectedSuggestion?.distanceMeters,
-        etaMinutes = uiState.value.selectedSuggestion?.etaMinutes?.toInt(),
-        onNavigate = { mapController.startNavigation() },
-        onCancel = onCancel,
-    )
+//    NavigationRoutePreviewLayout(
+//        modifier = modifier,
+//        placeName = uiState.value.selectedSuggestion!!.name,
+//        address = uiState.value.selectedSuggestion?.address?.formattedAddress ?: "",
+//        distance = uiState.value.selectedSuggestion?.distanceMeters,
+//        etaMinutes = uiState.value.selectedSuggestion?.etaMinutes?.toInt(),
+//        onNavigate = { mapController.startNavigation() },
+//        onCancel = onCancel,
+//    )
 }
 
 

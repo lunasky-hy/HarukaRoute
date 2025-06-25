@@ -8,18 +8,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.lunaskyhy.harukaroute.R
 import com.lunaskyhy.harukaroute.map.HarukaMapController
 import com.lunaskyhy.harukaroute.map.MapControllerProvider
 import com.lunaskyhy.harukaroute.ui.screen.navigation.NavigationScreen
 
 @Composable
-fun MapOverlayScreen(
+fun MapScreen(
     modifier: Modifier = Modifier,
     harukaMapController: HarukaMapController = MapControllerProvider.harukaMapController
 ) {
@@ -43,7 +45,8 @@ fun MapOverlayScreen(
             NavHost(
                 navController = navController,
                 startDestination = NavRoute.Free.name,
-                modifier = modifier.padding(paddingValues).padding(24.dp),
+                modifier = modifier.padding(paddingValues)
+                    .padding(horizontal = dimensionResource(R.dimen.padding_medium))
             ) {
                 composable(NavRoute.Free.name) {
                     NavigationScreen(modifier = modifier)

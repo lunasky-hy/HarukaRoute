@@ -14,7 +14,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.lunaskyhy.harukaroute.map.HarukaMapController
 import com.lunaskyhy.harukaroute.map.MapControllerProvider
-import com.lunaskyhy.harukaroute.ui.MapOverlayScreen
+import com.lunaskyhy.harukaroute.ui.MapScreen
 import com.lunaskyhy.harukaroute.ui.theme.AppTheme
 
 const val TAG = "MainActivity"
@@ -100,7 +100,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AppTheme {
-                MapOverlayScreen()
+                MapScreen()
             }
         }
     }
