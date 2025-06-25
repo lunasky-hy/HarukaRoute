@@ -3,7 +3,7 @@ agp = "8.9.1"
 mapbox = "3.8.6"
 mapboxExtension = "11.12.0-beta.1"
 mapboxSearch = "2.12.0-beta.1"
-app = "1.4.0"
+carApp = "1.7.0-rc01"
 kotlin = "2.0.21"
 coreKtx = "1.16.0"
 junit = "4.13.2"
@@ -17,6 +17,8 @@ runtimeLivedata = "1.8.1"
 fragmentKtx = "1.8.6"
 gmsLocation = "21.0.1"
 composeNav = "2.9.0"
+appcompat = "1.7.1"
+material = "1.12.0"
 
 
 [libraries]
@@ -37,7 +39,9 @@ mapbox-search-offline = { group = "com.mapbox.search", name = "offline", version
 mapbox-search-mapbox-search-android = { group = "com.mapbox.search", name = "mapbox-search-android", version.ref = "mapboxSearch" }
 mapbox-search-mapbox-search-android-ui = { group = "com.mapbox.search", name = "mapbox-search-android-ui", version.ref = "mapboxSearch" }
 
-androidx-app = { module = "androidx.car.app:app", version.ref = "app" }
+androidx-car-app = { group = "androidx.car.app", name = "app", version.ref = "carApp" }
+androidx-car-app-projected = { group = "androidx.car.app", name = "app-projected", version.ref = "carApp" }
+androidx-car-app-testing = { group = "androidx.car.app", name = "app-testing", version.ref = "carApp" }
 androidx-gms-location = { module = "com.google.android.gms:play-services-location", version.ref = "gmsLocation"}
 
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -60,9 +64,12 @@ androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
 androidx-fragment-ktx = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "fragmentKtx" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "composeNav" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+android-library = { id = "com.android.library", version.ref = "agp" }
 

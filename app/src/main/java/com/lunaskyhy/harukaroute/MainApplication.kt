@@ -1,12 +1,10 @@
 package com.lunaskyhy.harukaroute
 
 import android.app.Application
-import com.lunaskyhy.harukaroute.map.MapControllerProvider
 
 class MainApplication: Application() {
     override fun onCreate() {
         super.onCreate()
-        MapControllerProvider.initialize(applicationContext)
     }
 }
 
