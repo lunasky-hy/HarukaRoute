@@ -11,24 +11,12 @@
             android:name="androidx.car.app.minCarApiLevel"
             android:value="3" />
 
-        <service android:name=".PlacesCarAppService"
-            android:exported="true">
-<!--            android:label="@string/app_name"-->
-<!--            android:icon="@mipmap/harukaroute_icon_round"-->
-<!--            android:roundIcon="@mipmap/harukaroute_icon_round"-->
-            <intent-filter>
-                <action android:name="androidx.car.app.CarAppService" />
-                <category android:name="androidx.car.app.category.POI" />
-<!--                source from : https://developer.android.com/training/cars/apps?hl=ja#supported-app-categories -->
-            </intent-filter>
-        </service>
-
-        <service android:name=".NavigationAppService"
+        <service android:name="com.lunaskyhy.harukaroute.carapp.NavigationCarAppService"
             android:exported="true">
             <intent-filter>
                 <action android:name="androidx.car.app.CarAppService" />
                 <category android:name="androidx.car.app.category.NAVIGATION" />
-                <!--                source from : https://developer.android.com/training/cars/apps?hl=ja#supported-app-categories -->
+                <!-- source from : https://developer.android.com/training/cars/apps?hl=ja#supported-app-categories -->
             </intent-filter>
         </service>
     </application>

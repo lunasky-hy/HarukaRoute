@@ -2,9 +2,20 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+
+    alias(libs.plugins.android.mapsplatform)
 }
 
 android {
+    signingConfigs {
+        getByName("debug") {
+            storeFile =
+                file("C:\\Users\\plane\\AndroidStudioProjects\\keystore\\harukaroutekey.jks")
+            keyAlias = "debug"
+            storePassword = "harukaroute"
+            keyPassword = "harukaroute"
+        }
+    }
     namespace = "com.lunaskyhy.harukaroute"
     compileSdk = 35
 
@@ -30,6 +41,8 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+
+        isCoreLibraryDesugaringEnabled = true
     }
     kotlinOptions {
         jvmTarget = "11"
@@ -37,6 +50,22 @@ android {
     buildFeatures {
         compose = true
     }
+}
+
+secrets {
+    // Optionally specify a different file name containing your secrets.
+    // The plugin defaults to "local.properties"
+    propertiesFileName = "secrets.properties"
+
+    // A properties file containing default secret values. This file can be
+    // checked in version control.
+    defaultPropertiesFileName = "local.defaults.properties"
+
+    // Configure which keys should be ignored by the plugin by providing regular expressions.
+    // "sdk.dir" is ignored by default.
+    ignoreList.add("keyToIgnore") // Ignore the key "keyToIgnore"
+    ignoreList.add("sdk.*")       // Ignore all keys matching the regexp "sdk.*"
+
 }
 
 dependencies {
@@ -57,6 +86,8 @@ dependencies {
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.car.app)
+    implementation(libs.google.map.navigation)
+    implementation(libs.google.map.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -67,4 +98,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(project(":common:data"))
     implementation(project(":common:car-app"))
+
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 }

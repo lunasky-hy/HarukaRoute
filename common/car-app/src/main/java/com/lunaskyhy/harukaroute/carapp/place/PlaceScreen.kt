@@ -1,4 +1,4 @@
-package com.lunaskyhy.carapp.place
+package com.lunaskyhy.harukaroute.carapp.place
 
 import android.text.Spannable
 import android.text.SpannableString

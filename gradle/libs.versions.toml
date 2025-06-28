@@ -1,5 +1,6 @@
 [versions]
 agp = "8.9.1"
+desugar_jdk_libs = "2.1.5"
 mapbox = "3.8.6"
 mapboxExtension = "11.12.0-beta.1"
 mapboxSearch = "2.12.0-beta.1"
@@ -19,9 +20,13 @@ gmsLocation = "21.0.1"
 composeNav = "2.9.0"
 appcompat = "1.7.1"
 material = "1.12.0"
+googleMap = "6.3.0"
+googleMapSecretPlugin = "2.0.1"
+googleMapCompose = "6.1.0"
 
 
 [libraries]
+desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar_jdk_libs" }
 mapbox-navigationcore = { group = "com.mapbox.navigationcore", name="android", version.ref = "mapbox" }
 mapbox-navigationcore-navigation =  { group = "com.mapbox.navigationcore", name="navigation", version.ref = "mapbox" }
 mapbox-navigationcore-copilot =     { group = "com.mapbox.navigationcore", name="copilot", version.ref = "mapbox" }
@@ -38,6 +43,10 @@ mapbox-search-place-autocomplete = { group = "com.mapbox.search", name = "place-
 mapbox-search-offline = { group = "com.mapbox.search", name = "offline", version.ref = "mapboxSearch" }
 mapbox-search-mapbox-search-android = { group = "com.mapbox.search", name = "mapbox-search-android", version.ref = "mapboxSearch" }
 mapbox-search-mapbox-search-android-ui = { group = "com.mapbox.search", name = "mapbox-search-android-ui", version.ref = "mapboxSearch" }
+
+google-map-navigation = { group = "com.google.android.libraries.navigation", name= "navigation", version.ref = "googleMap"}
+google-maps-gradle-plugin = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "googleMapSecretPlugin" }
+google-map-compose = { group = "com.google.maps.android", name = "maps-compose", version.ref = "googleMapCompose" }
 
 androidx-car-app = { group = "androidx.car.app", name = "app", version.ref = "carApp" }
 androidx-car-app-projected = { group = "androidx.car.app", name = "app-projected", version.ref = "carApp" }
@@ -72,4 +81,4 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 android-library = { id = "com.android.library", version.ref = "agp" }
-
+android-mapsplatform = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin" }

@@ -5,3 +5,20 @@ plugins {
     alias(libs.plugins.kotlin.compose) apply false
     alias(libs.plugins.android.library) apply false
 }
+
+allprojects {
+    afterEvaluate {
+        if (plugins.hasPlugin("com.android.application") || plugins.hasPlugin("com.android.library")) {
+            configurations.named("implementation") {
+                exclude(group = "com.google.android.gms", module = "play-services-maps")
+
+            }
+        }
+    }
+}
+
+buildscript {
+    dependencies {
+        classpath(libs.google.maps.gradle.plugin)
+    }
+}

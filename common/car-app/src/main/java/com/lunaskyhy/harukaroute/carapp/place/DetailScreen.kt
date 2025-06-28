@@ -1,4 +1,4 @@
-package com.lunaskyhy.carapp.place
+package com.lunaskyhy.harukaroute.carapp.place
 
 import androidx.car.app.CarContext
 import androidx.car.app.Screen

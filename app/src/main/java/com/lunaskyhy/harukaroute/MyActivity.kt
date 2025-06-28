@@ -30,9 +30,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.lunaskyhy.data.PlacesRepository
 import com.lunaskyhy.data.model.Place
 import com.lunaskyhy.data.model.toIntent
+import com.lunaskyhy.harukaroute.map.MapScreen
 import com.lunaskyhy.harukaroute.ui.theme.AppTheme
 
 class MyActivity : ComponentActivity() {
@@ -48,18 +48,7 @@ class MyActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Column {
-                        Text(
-                            text = "Places",
-                            style = MaterialTheme.typography.displayLarge,
-                            modifier = Modifier.padding(8.dp)
-                        )
-                        ProjectionState(
-                            carConnectionType = carConnectionType,
-                            modifier = Modifier.padding(8.dp)
-                        )
-                        PlaceList(places = PlacesRepository().getPlaces())
-                    }
+                    MapScreen()
                 }
             }
         }
