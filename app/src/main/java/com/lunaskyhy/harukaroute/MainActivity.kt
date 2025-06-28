@@ -19,11 +19,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,29 +34,34 @@ import com.lunaskyhy.data.model.toIntent
 import com.lunaskyhy.harukaroute.map.MapScreen
 import com.lunaskyhy.harukaroute.ui.theme.AppTheme
 
-class MyActivity : ComponentActivity() {
+class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        actionBar?.hide()
 
         setContent {
-            val carConnectionType by CarConnection(this).type.observeAsState(initial = -1)
             AppTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    MapScreen()
+                Scaffold(
+                    topBar = {},
+                ) { innerPadding ->
+                    Surface(
+                        modifier = Modifier.fillMaxSize().padding(innerPadding),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        MapScreen()
+                    }
                 }
             }
         }
     }
-
 }
 
 @Composable
 fun ProjectionState(carConnectionType: Int, modifier: Modifier = Modifier) {
+    // contextを受け取れるところで、下記を実行し、carConnectionTypeとして受け取ること。
+    //            val carConnectionType by CarConnection(this).type.observeAsState(initial = -1)
+
     val text = when (carConnectionType) {
         CarConnection.CONNECTION_TYPE_NOT_CONNECTED -> "Not projecting"
         CarConnection.CONNECTION_TYPE_NATIVE -> "Running on Android Automotive OS"
@@ -112,7 +116,6 @@ fun PlaceList(places: List<Place>) {
                         maxLines = 1
                     )
                 }
-
             }
         }
     }

@@ -38,6 +38,9 @@ android {
             )
         }
     }
+    buildFeatures {
+        buildConfig = true
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -80,7 +83,6 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material.icon.core)
     implementation(libs.androidx.material.icon.extended)
-    implementation(libs.androidx.gms.location)
     implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.fragment.ktx)
@@ -88,6 +90,9 @@ dependencies {
     implementation(libs.androidx.car.app)
     implementation(libs.google.map.navigation)
     implementation(libs.google.map.compose)
+    implementation(libs.play.services.maps)
+    implementation(libs.play.services.location)
+    implementation(libs.accompanist.permissions)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
