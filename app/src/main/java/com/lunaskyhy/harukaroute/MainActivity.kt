@@ -1,45 +1,44 @@
 package com.lunaskyhy.harukaroute
 
-import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.car.app.connection.CarConnection
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Place
-import androidx.compose.material3.Icon
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment.Companion.CenterVertically
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
-import com.lunaskyhy.data.model.Place
-import com.lunaskyhy.data.model.toIntent
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.lunaskyhy.harukaroute.map.MapScreen
 import com.lunaskyhy.harukaroute.ui.theme.AppTheme
 
+
+private const val LOCATION_PERMISSION_REQUEST_CODE = 1
+
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         actionBar?.hide()
 
+        if (checkLocationPermission()) {
+            render()
+        } else {
+            requestLocationPermission()
+        }
+    }
+
+    private fun render() {
         setContent {
             AppTheme {
                 Scaffold(
@@ -55,67 +54,46 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-}
 
-@Composable
-fun ProjectionState(carConnectionType: Int, modifier: Modifier = Modifier) {
-    // contextを受け取れるところで、下記を実行し、carConnectionTypeとして受け取ること。
-    //            val carConnectionType by CarConnection(this).type.observeAsState(initial = -1)
-
-    val text = when (carConnectionType) {
-        CarConnection.CONNECTION_TYPE_NOT_CONNECTED -> "Not projecting"
-        CarConnection.CONNECTION_TYPE_NATIVE -> "Running on Android Automotive OS"
-        CarConnection.CONNECTION_TYPE_PROJECTION -> "Projecting"
-        else -> "Unknown connection type"
+    private fun renderLocationPermissionDeniedDisplay() {
+        setContent {
+            Box(modifier = Modifier, contentAlignment = Alignment.Center) {
+                Column {
+                    Text("位置情報が許可されていません。")
+                    Text("このアプリは位置情報が必須です。")
+                    Button(onClick = { requestLocationPermission() }) {
+                        Text("許可する")
+                    }
+                }
+            }
+        }
     }
 
-    Text(
-        text = text,
-        style = MaterialTheme.typography.bodyMedium,
-        modifier = modifier
-    )
-}
+    private fun checkLocationPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED
+    }
 
-@Composable
-fun PlaceList(places: List<Place>) {
-    val context = LocalContext.current
+    private fun requestLocationPermission() {
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+            LOCATION_PERMISSION_REQUEST_CODE
+        )
+    }
 
-    LazyColumn {
-        items(places.size) {
-            val place = places[it]
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-                    .border(
-                        2.dp,
-                        color = MaterialTheme.colorScheme.outline,
-                        shape = RoundedCornerShape(8.dp)
-                    )
-                    .clip(RoundedCornerShape(8.dp))
-                    .clickable {
-                        context.startActivity(place.toIntent(Intent.ACTION_VIEW))
-                    }
-                    .padding(8.dp)
-            ) {
-                Icon(
-                    Icons.Default.Place,
-                    "Place icon",
-                    modifier = Modifier.align(CenterVertically),
-                    tint = MaterialTheme.colorScheme.surfaceTint
-                )
-                Column {
-                    Text(
-                        text = place.name,
-                        style = MaterialTheme.typography.labelLarge
-                    )
-                    Text(
-                        text = place.description,
-                        style = MaterialTheme.typography.bodyMedium,
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = 1
-                    )
-                }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray,
+        deviceId: Int
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults, deviceId)
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                render()
+            } else {
+                renderLocationPermissionDeniedDisplay()
             }
         }
     }

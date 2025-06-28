@@ -49,6 +49,8 @@ mapbox-search-mapbox-search-android-ui = { group = "com.mapbox.search", name = "
 google-map-navigation = { group = "com.google.android.libraries.navigation", name= "navigation", version.ref = "googleMap"}
 google-maps-gradle-plugin = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "googleMapSecretPlugin" }
 google-map-compose = { group = "com.google.maps.android", name = "maps-compose", version.ref = "googleMapCompose" }
+google-map-compose-utils = { group = "com.google.maps.android", name = "maps-compose-utils", version.ref = "googleMapCompose" }
+google-map-compose-widgets = { group = "com.google.maps.android", name = "maps-compose-widgets", version.ref = "googleMapCompose" }
 
 androidx-car-app = { group = "androidx.car.app", name = "app", version.ref = "carApp" }
 androidx-car-app-projected = { group = "androidx.car.app", name = "app-projected", version.ref = "carApp" }

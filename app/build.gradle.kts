@@ -90,6 +90,8 @@ dependencies {
     implementation(libs.androidx.car.app)
     implementation(libs.google.map.navigation)
     implementation(libs.google.map.compose)
+    implementation(libs.google.map.compose.utils)
+    implementation(libs.google.map.compose.widgets)
     implementation(libs.play.services.maps)
     implementation(libs.play.services.location)
     implementation(libs.accompanist.permissions)
