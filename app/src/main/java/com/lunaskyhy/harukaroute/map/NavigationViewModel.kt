@@ -30,6 +30,10 @@ class NavigationViewModel(
     var routePolyline by mutableStateOf<List<LatLng>>(emptyList())
     var nextTurnInfo by mutableStateOf<String?>(null)
 
+    init {
+        startLocationUpdates()
+    }
+
     fun startNavigation() {
         // ... Navigatorを初期化して、ナビを開始 ...
         // navigator.setRouteChangedListener { ... } でルート情報を取得して routePolyline を更新
