@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 
     alias(libs.plugins.android.mapsplatform)
+    alias(libs.plugins.android.serialization)
 }
 
 android {

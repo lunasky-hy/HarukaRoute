@@ -8,5 +8,6 @@
     <dimen name="floating_button_bottom_padding">32dp</dimen>
     <dimen name="place_search_card_corner_radius">20dp</dimen>
     <dimen name="place_suggestion_min_height">512dp</dimen>
-
+    <dimen name="map_overlay_search_box_padding_top">32dp</dimen>
+    <dimen name="map_overlay_search_history_padding_top">56dp</dimen>"
 </resources>

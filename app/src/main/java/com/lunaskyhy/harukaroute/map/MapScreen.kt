@@ -27,7 +27,7 @@ import com.lunaskyhy.harukaroute.ui.AppViewModelProvider
 
 @Composable
 fun MapScreen(
-    viewModel: NavigationViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: NavigationViewModel
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val cameraPositionState = rememberCameraPositionState {

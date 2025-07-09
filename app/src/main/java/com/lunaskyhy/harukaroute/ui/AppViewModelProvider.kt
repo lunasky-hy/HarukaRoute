@@ -6,6 +6,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.lunaskyhy.harukaroute.MainApplication
 import com.lunaskyhy.harukaroute.map.NavigationViewModel
+import com.lunaskyhy.harukaroute.ui.overlay.viewmodel.SearchLocationViewModel
 
 object AppViewModelProvider {
     val Factory = viewModelFactory {
@@ -13,6 +14,10 @@ object AppViewModelProvider {
             NavigationViewModel(
                 myApplication().container.locationRepository
             )
+        }
+
+        initializer {
+            SearchLocationViewModel()
         }
     }
 }

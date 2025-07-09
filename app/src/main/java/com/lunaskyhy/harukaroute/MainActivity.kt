@@ -18,7 +18,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lunaskyhy.harukaroute.map.MapScreen
+import com.lunaskyhy.harukaroute.map.NavigationViewModel
+import com.lunaskyhy.harukaroute.ui.AppViewModelProvider
+import com.lunaskyhy.harukaroute.ui.OverlayNavigation
 import com.lunaskyhy.harukaroute.ui.theme.AppTheme
 
 
@@ -39,16 +43,20 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun render() {
+
         setContent {
+            val mapViewModel: NavigationViewModel = viewModel(factory = AppViewModelProvider.Factory)
+
             AppTheme {
                 Scaffold(
                     topBar = {},
                 ) { innerPadding ->
                     Surface(
-                        modifier = Modifier.fillMaxSize().padding(innerPadding),
+                        modifier = Modifier.fillMaxSize().padding(bottom = innerPadding.calculateBottomPadding()),
                         color = MaterialTheme.colorScheme.background
                     ) {
-                        MapScreen()
+                        MapScreen(mapViewModel)
+                        OverlayNavigation(mapViewModel = mapViewModel)
                     }
                 }
             }
