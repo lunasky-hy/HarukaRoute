@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.lunaskyhy.harukaroute.map.MapPlaces
 import com.lunaskyhy.harukaroute.map.MapScreen
 import com.lunaskyhy.harukaroute.map.NavigationViewModel
 import com.lunaskyhy.harukaroute.ui.AppViewModelProvider
@@ -36,6 +37,7 @@ class MainActivity : ComponentActivity() {
         actionBar?.hide()
 
         if (checkLocationPermission()) {
+            MapPlaces.init(context = applicationContext)
             render()
         } else {
             requestLocationPermission()

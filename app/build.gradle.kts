@@ -93,6 +93,7 @@ dependencies {
     implementation(libs.google.map.compose)
     implementation(libs.google.map.compose.utils)
     implementation(libs.google.map.compose.widgets)
+    implementation(libs.google.map.places)
     implementation(libs.play.services.maps)
     implementation(libs.play.services.location)
     implementation(libs.accompanist.permissions)
