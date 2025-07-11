@@ -52,6 +52,7 @@ import com.lunaskyhy.harukaroute.ui.theme.AppTypography
 fun SearchLocationOverlayScreen(
     mapViewModel: NavigationViewModel,
     viewModel: SearchLocationViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    backNavigate: () -> Unit = {},
 ) {
     val query by viewModel.query.collectAsState()
     val autoComplete by viewModel.searchUiState.collectAsStateWithLifecycle()
@@ -60,6 +61,7 @@ fun SearchLocationOverlayScreen(
         searchQuery = query,
         searchQueryOnChange = viewModel::updateSearchQuery,
         autocompleteUiState = autoComplete,
+        backNavigate = backNavigate,
     )
 }
 
@@ -68,7 +70,8 @@ private fun SearchLocationOverlayLayout(
     modifier: Modifier = Modifier,
     searchQuery: String = "",
     searchQueryOnChange: (String) -> Unit = {},
-    autocompleteUiState: LocationAutocompleteUiState = LocationAutocompleteUiState.Empty
+    autocompleteUiState: LocationAutocompleteUiState = LocationAutocompleteUiState.Empty,
+    backNavigate: () -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -78,6 +81,7 @@ private fun SearchLocationOverlayLayout(
         LocationQueryField(
             searchQuery = searchQuery,
             searchQueryOnChange = searchQueryOnChange,
+            backNavigate = backNavigate,
         )
 
         Card(
@@ -111,6 +115,7 @@ fun LocationQueryField(
     modifier: Modifier = Modifier,
     searchQuery: String = "",
     searchQueryOnChange: (String) -> Unit = {},
+    backNavigate: () -> Unit = {},
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -126,23 +131,24 @@ fun LocationQueryField(
             color = MaterialTheme.colorScheme.surfaceVariant
         )
     ) {
-        BasicTextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = searchQuery,
-            onValueChange = searchQueryOnChange,
-            textStyle = AppTypography.bodyLarge,
-            singleLine = true,
-        ) { innerTextField ->
-            Row(
-                modifier = Modifier
-                    .padding(dimensionResource(R.dimen.padding_medium))
-                    .padding(horizontal = dimensionResource(R.dimen.padding_small)),
-                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_medium))
-            ) {
-                Icon(
-                    Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Location Search"
-                )
+        Row(
+            modifier = Modifier
+                .padding(dimensionResource(R.dimen.padding_medium))
+                .padding(horizontal = dimensionResource(R.dimen.padding_small)),
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_medium))
+        ) {
+            Icon(
+                Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Location Search",
+                modifier = Modifier.clickable { backNavigate() }
+            )
+            BasicTextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = searchQuery,
+                onValueChange = searchQueryOnChange,
+                textStyle = AppTypography.bodyLarge,
+                singleLine = true,
+            ) { innerTextField ->
                 innerTextField()
             }
         }

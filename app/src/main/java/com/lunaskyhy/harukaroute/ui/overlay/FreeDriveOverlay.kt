@@ -36,7 +36,6 @@ fun FreeDriveOverlayScreen(
 @Composable
 private fun FreeDriveOverlayLayout(
     modifier: Modifier = Modifier,
-    searchText: String = "",
     toSearchLocation: () -> Unit = {},
 ) {
     Box(modifier = modifier.fillMaxSize()) {

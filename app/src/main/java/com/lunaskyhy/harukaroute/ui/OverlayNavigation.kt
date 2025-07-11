@@ -18,10 +18,14 @@ fun OverlayNavigation(
 
     NavHost(navController = navController, startDestination = OverlayRoutePath.FREE_DRIVE.name) {
         composable(OverlayRoutePath.FREE_DRIVE.name) {
-            FreeDriveOverlayScreen(mapViewModel, toSearchLocation = { navController.navigate(OverlayRoutePath.SEARCH_LOCATION.name) })
+            FreeDriveOverlayScreen(
+                mapViewModel,
+                toSearchLocation = { navController.navigate(OverlayRoutePath.SEARCH_LOCATION.name) })
         }
         composable(OverlayRoutePath.SEARCH_LOCATION.name) {
-            SearchLocationOverlayScreen(mapViewModel)
+            SearchLocationOverlayScreen(
+                mapViewModel,
+                backNavigate = { navController.popBackStack() })
         }
     }
 }
