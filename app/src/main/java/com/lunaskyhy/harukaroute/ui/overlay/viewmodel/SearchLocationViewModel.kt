@@ -3,10 +3,8 @@ package com.lunaskyhy.harukaroute.ui.overlay.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken
-import com.google.android.libraries.places.api.model.CircularBounds
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
 import com.lunaskyhy.harukaroute.map.MapPlaces
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -20,17 +18,14 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.tasks.await
 
 const val TAG = "SearchLocationViewModel"
 
 class SearchLocationViewModel(
 //    locationRepository: LocationRepository,
-): ViewModel() {
+) : ViewModel() {
     private val _query = MutableStateFlow("")
     val query = _query.asStateFlow()
 
@@ -83,8 +78,8 @@ class SearchLocationViewModel(
 }
 
 sealed interface LocationAutocompleteUiState {
-    data object Loading: LocationAutocompleteUiState
-    data class Success(val predictions: List<AutocompletePrediction>): LocationAutocompleteUiState
-    data class Error(val exception: String): LocationAutocompleteUiState
-    data object  Empty: LocationAutocompleteUiState
+    data object Loading : LocationAutocompleteUiState
+    data class Success(val predictions: List<AutocompletePrediction>) : LocationAutocompleteUiState
+    data class Error(val exception: String) : LocationAutocompleteUiState
+    data object Empty : LocationAutocompleteUiState
 }

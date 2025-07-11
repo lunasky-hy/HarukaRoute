@@ -57,8 +57,8 @@ fun SearchLocationOverlayScreen(
     val autoComplete by viewModel.searchUiState.collectAsStateWithLifecycle()
 
     SearchLocationOverlayLayout(
-        searchText = query,
-        searchTextOnChange = viewModel::updateSearchQuery,
+        searchQuery = query,
+        searchQueryOnChange = viewModel::updateSearchQuery,
         autocompleteUiState = autoComplete,
     )
 }
@@ -66,8 +66,8 @@ fun SearchLocationOverlayScreen(
 @Composable
 private fun SearchLocationOverlayLayout(
     modifier: Modifier = Modifier,
-    searchText: String = "",
-    searchTextOnChange: (String) -> Unit = {},
+    searchQuery: String = "",
+    searchQueryOnChange: (String) -> Unit = {},
     autocompleteUiState: LocationAutocompleteUiState = LocationAutocompleteUiState.Empty
 ) {
     Column(
@@ -75,42 +75,10 @@ private fun SearchLocationOverlayLayout(
             .padding(dimensionResource(R.dimen.padding_large))
             .padding(top = dimensionResource(R.dimen.map_overlay_search_box_padding_top)),
     ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth(),
-            shape = CircleShape,
-            colors = CardColors(
-                contentColor = MaterialTheme.colorScheme.onSurface,
-                containerColor = MaterialTheme.colorScheme.surface,
-                disabledContentColor = MaterialTheme.colorScheme.surface,
-                disabledContainerColor = MaterialTheme.colorScheme.surface
-            ),
-            border = BorderStroke(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.surfaceVariant
-            )
-        ) {
-            BasicTextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = searchText,
-                onValueChange = searchTextOnChange,
-                textStyle = AppTypography.bodyLarge,
-                singleLine = true,
-            ) { innerTextField ->
-                Row(
-                    modifier = Modifier
-                        .padding(dimensionResource(R.dimen.padding_medium))
-                        .padding(horizontal = dimensionResource(R.dimen.padding_small)),
-                    horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_medium))
-                ) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Location Search"
-                    )
-                    innerTextField()
-                }
-            }
-        }
+        LocationQueryField(
+            searchQuery = searchQuery,
+            searchQueryOnChange = searchQueryOnChange,
+        )
 
         Card(
             modifier = Modifier
@@ -139,6 +107,49 @@ private fun SearchLocationOverlayLayout(
 }
 
 @Composable
+fun LocationQueryField(
+    modifier: Modifier = Modifier,
+    searchQuery: String = "",
+    searchQueryOnChange: (String) -> Unit = {},
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = CircleShape,
+        colors = CardColors(
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            containerColor = MaterialTheme.colorScheme.surface,
+            disabledContentColor = MaterialTheme.colorScheme.surface,
+            disabledContainerColor = MaterialTheme.colorScheme.surface
+        ),
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.surfaceVariant
+        )
+    ) {
+        BasicTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = searchQuery,
+            onValueChange = searchQueryOnChange,
+            textStyle = AppTypography.bodyLarge,
+            singleLine = true,
+        ) { innerTextField ->
+            Row(
+                modifier = Modifier
+                    .padding(dimensionResource(R.dimen.padding_medium))
+                    .padding(horizontal = dimensionResource(R.dimen.padding_small)),
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_medium))
+            ) {
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Location Search"
+                )
+                innerTextField()
+            }
+        }
+    }
+}
+
+@Composable
 fun LocationSearchAutocomplete(
     autocompleteUiState: LocationAutocompleteUiState = LocationAutocompleteUiState.Loading,
     onClick: (AutocompletePrediction) -> Unit = {},
@@ -150,9 +161,9 @@ fun LocationSearchAutocomplete(
                     Column {
                         Row(
                             modifier = Modifier
+                                .clickable { onClick(it) }
                                 .fillMaxWidth()
-                                .padding(dimensionResource(R.dimen.padding_medium))
-                                .clickable { onClick(it) },
+                                .padding(dimensionResource(R.dimen.padding_medium)),
                             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_medium)),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
