@@ -8,7 +8,12 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.tasks.Task
 import com.google.android.libraries.navigation.Navigator
+import com.google.android.libraries.places.api.model.AutocompleteSessionToken
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.net.FetchPlaceRequest
+import com.google.android.libraries.places.api.net.FetchPlaceResponse
 import com.lunaskyhy.harukaroute.data.repos.LocationRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,6 +21,16 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+
+object LocationDetailSettings {
+    val placeFields: List<Place.Field> = listOf(
+        Place.Field.ID,
+        Place.Field.LOCATION,
+        Place.Field.SHORT_FORMATTED_ADDRESS,
+        Place.Field.RESOURCE_NAME
+    )
+}
 
 class NavigationViewModel(
     private val locationRepository: LocationRepository
@@ -23,8 +38,11 @@ class NavigationViewModel(
     // Navigator のインスタンスを保持
     private var navigator: Navigator? = null
 
-    private val _uiState = MutableStateFlow(NavigationState())
-    val uiState = _uiState.asStateFlow()
+    private val _currentLocationState = MutableStateFlow(CurrentLocationState())
+    val currentLocationState = _currentLocationState.asStateFlow()
+
+    private val _locationDetailUiState = MutableStateFlow<LocationDetailUiState>(LocationDetailUiState.PlaceUnselected)
+    val locationDetailUiState = _locationDetailUiState.asStateFlow()
 
     // ルートのPolylineやナビ情報などをStateで公開
     var routePolyline by mutableStateOf<List<LatLng>>(emptyList())
@@ -40,18 +58,52 @@ class NavigationViewModel(
         // navigator.addNavInfoListener { navInfo -> ... } でナビ情報を取得して nextTurnInfo を更新
     }
 
-    fun startLocationUpdates() {
+    private fun startLocationUpdates() {
         locationRepository.getLocationUpdates()
             .onEach { location ->
-                _uiState.update {
+                _currentLocationState.update {
                     it.copy(lastKnownLocation = location, isLoading = false)
                 }
             }.catch { e -> Log.e("LocationUpdates", "Error: ${e.message}") }
             .launchIn(viewModelScope)
     }
+
+    fun setLocationDetail(placeId: String, sessionToken: AutocompleteSessionToken?) {
+        _locationDetailUiState.value = LocationDetailUiState.Loading(placeId, sessionToken)
+
+        // viewModelScopeで非同期処理を開始
+        viewModelScope.launch {
+            getLocationDetail(placeId)
+                .addOnSuccessListener { response ->
+                    // 成功したら、取得したPlaceオブジェクトでSuccess状態に更新
+                    val place = response.place
+                    _locationDetailUiState.value = LocationDetailUiState.Success(place = place)
+                }
+                .addOnFailureListener { exception ->
+                    // 失敗した場合の処理
+                    // ここではログを出力して、状態を未選択に戻している
+                    Log.e("NavigationViewModel", "場所の詳細取得に失敗しました。", exception)
+                    _locationDetailUiState.value = LocationDetailUiState.Error("場所の詳細取得に失敗しました。$exception")
+                }
+        }
+    }
+
+    private fun getLocationDetail(placeId: String): Task<FetchPlaceResponse> {
+        // Define a place ID.
+        val request = FetchPlaceRequest.newInstance(placeId, LocationDetailSettings.placeFields)
+        val placeTask = MapPlaces.getPlacesClient().fetchPlace(request)
+        return placeTask
+    }
 }
 
-data class NavigationState(
+data class CurrentLocationState(
     val lastKnownLocation: Location? = null,
     val isLoading: Boolean = true,
 )
+
+sealed interface LocationDetailUiState {
+    data object PlaceUnselected : LocationDetailUiState
+    data class Loading(val placeId: String, val sessionToken: AutocompleteSessionToken?) : LocationDetailUiState
+    data class Success(val place: Place? = null, val isLoading: Boolean = true, ) : LocationDetailUiState
+    data class Error(val exception: String) : LocationDetailUiState
+}

@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.lunaskyhy.harukaroute.map.NavigationViewModel
 import com.lunaskyhy.harukaroute.ui.overlay.FreeDriveOverlayScreen
+import com.lunaskyhy.harukaroute.ui.overlay.LocationDetailOverlay
 import com.lunaskyhy.harukaroute.ui.overlay.SearchLocationOverlayScreen
 
 @Composable
@@ -25,7 +26,15 @@ fun OverlayNavigation(
         composable(OverlayRoutePath.SEARCH_LOCATION.name) {
             SearchLocationOverlayScreen(
                 mapViewModel,
-                backNavigate = { navController.popBackStack() })
+                backNavigate = { navController.popBackStack() },
+                navigateToLocationDetail = { navController.navigate(OverlayRoutePath.LOCATION_DETAIL.name) }
+            )
+        }
+        composable(OverlayRoutePath.LOCATION_DETAIL.name) {
+            LocationDetailOverlay(
+                mapViewModel,
+                backNavigate = { navController.popBackStack() },
+            )
         }
     }
 }
@@ -33,6 +42,7 @@ fun OverlayNavigation(
 private enum class OverlayRoutePath {
     FREE_DRIVE,
     SEARCH_LOCATION,
+    LOCATION_DETAIL,
     ROUTE_PLAN,
     NAVIGATION_ROUTE,
 }

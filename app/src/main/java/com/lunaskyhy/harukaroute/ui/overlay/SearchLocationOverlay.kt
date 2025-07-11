@@ -57,15 +57,22 @@ fun SearchLocationOverlayScreen(
     mapViewModel: NavigationViewModel,
     viewModel: SearchLocationViewModel = viewModel(factory = AppViewModelProvider.Factory),
     backNavigate: () -> Unit = {},
+    navigateToLocationDetail: () -> Unit = {},
 ) {
     val query by viewModel.query.collectAsState()
     val autoComplete by viewModel.searchUiState.collectAsStateWithLifecycle()
+
+    val onSelectLocation = { prediction: AutocompletePrediction ->
+        mapViewModel.setLocationDetail(prediction.placeId, viewModel.placeSessionToken)
+        navigateToLocationDetail()
+    }
 
     SearchLocationOverlayLayout(
         searchQuery = query,
         searchQueryOnChange = viewModel::updateSearchQuery,
         autocompleteUiState = autoComplete,
         backNavigate = backNavigate,
+        onSelectLocation = onSelectLocation,
     )
 }
 
@@ -76,6 +83,7 @@ private fun SearchLocationOverlayLayout(
     searchQueryOnChange: (String) -> Unit = {},
     autocompleteUiState: LocationAutocompleteUiState = LocationAutocompleteUiState.Empty,
     backNavigate: () -> Unit = {},
+    onSelectLocation: (AutocompletePrediction) -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -107,7 +115,10 @@ private fun SearchLocationOverlayLayout(
                 modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium)),
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_medium))
             ) {
-                LocationSearchAutocomplete(autocompleteUiState = autocompleteUiState, onClick = {})
+                LocationSearchAutocomplete(
+                    autocompleteUiState = autocompleteUiState,
+                    onClick = onSelectLocation,
+                )
                 SearchHistory()
             }
         }

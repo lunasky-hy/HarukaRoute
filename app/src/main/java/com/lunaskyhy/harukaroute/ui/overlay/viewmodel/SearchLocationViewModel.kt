@@ -3,9 +3,11 @@ package com.lunaskyhy.harukaroute.ui.overlay.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.tasks.Task
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsResponse
 import com.lunaskyhy.harukaroute.map.MapPlaces
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -29,6 +31,8 @@ class SearchLocationViewModel(
     private val _query = MutableStateFlow("")
     val query = _query.asStateFlow()
 
+    val placeSessionToken = AutocompleteSessionToken.newInstance()
+
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     val searchUiState: StateFlow<LocationAutocompleteUiState> = query.debounce(500L)
         .filter { it.isNotBlank() }
@@ -36,20 +40,7 @@ class SearchLocationViewModel(
             Log.d(TAG, "query: $q")
             flow {
                 emit(LocationAutocompleteUiState.Loading)
-
-//                val center = LatLng(37.7749, -122.4194)
-//                val locationNearbyCircle = CircularBounds.newInstance(center,  /* radius = */5000.0)
-
-                val token = AutocompleteSessionToken.newInstance()
-                val request = FindAutocompletePredictionsRequest.builder()
-                    .setSessionToken(token)
-                    .setQuery(q)
-//                    .setLocationRestriction(locationNearbyCircle)
-                    .build()
-                Log.d(TAG, "request")
-
-                val res = MapPlaces.getPlacesClient().findAutocompletePredictions(request).await()
-                Log.d(TAG, "response")
+                val res = getAutocompletePredictions(q).await()
                 emit(LocationAutocompleteUiState.Success(res.autocompletePredictions))
             }.catch {
                 emit(LocationAutocompleteUiState.Error(it.message.toString()))
@@ -66,7 +57,21 @@ class SearchLocationViewModel(
         _query.value = text
     }
 
-//    fun currentLocaton() {
+    private fun getAutocompletePredictions(queryStr: String): Task<FindAutocompletePredictionsResponse> {
+//        val center = LatLng(37.7749, -122.4194)
+//        val locationNearbyCircle = CircularBounds.newInstance(center,  /* radius = */5000.0)
+
+        val request = FindAutocompletePredictionsRequest.builder()
+            .setSessionToken(placeSessionToken)
+            .setQuery(queryStr)
+//                    .setLocationRestriction(locationNearbyCircle)
+            .build()
+        Log.d(TAG, "request")
+
+        return MapPlaces.getPlacesClient().findAutocompletePredictions(request)
+    }
+
+//    fun currentLocation() {
 //        locationRepository.getLocationUpdates()
 //            .onEach { location ->
 //                _uiState.update {
