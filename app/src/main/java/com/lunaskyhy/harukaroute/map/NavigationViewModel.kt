@@ -28,6 +28,7 @@ object LocationDetailSettings {
     val placeFields: List<Place.Field> = listOf(
         Place.Field.ID,
         Place.Field.LOCATION,
+        Place.Field.DISPLAY_NAME,
         Place.Field.SHORT_FORMATTED_ADDRESS,
         Place.Field.RESOURCE_NAME
     )

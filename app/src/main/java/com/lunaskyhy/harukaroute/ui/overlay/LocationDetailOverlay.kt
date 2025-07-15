@@ -85,8 +85,8 @@ fun LocationDetailOverlayLayout(
             when (uiState) {
                 is LocationDetailUiState.Success -> {
                     LocationDetailSuccess(
-                        locationPrimaryText = uiState.place?.shortFormattedAddress ?: "",
-                        locationSecondaryText = uiState.place?.resourceName ?: "",
+                        locationPrimaryText = uiState.place?.displayName ?: "",
+                        locationSecondaryText = uiState.place?.shortFormattedAddress ?: "",
                         closeOnClick = closeOnClick,
                         startNaviOnClick = startNaviOnClick,
                         routePreviewOnClick = routePreviewOnClick,
