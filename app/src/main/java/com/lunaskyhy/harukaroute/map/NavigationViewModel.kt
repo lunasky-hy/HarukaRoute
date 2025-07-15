@@ -3,10 +3,12 @@ package com.lunaskyhy.harukaroute.map
 import android.location.Location
 import android.util.Log
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.Task
 import com.google.android.libraries.navigation.Navigator
@@ -45,6 +47,13 @@ class NavigationViewModel(
     private val _locationDetailUiState = MutableStateFlow<LocationDetailUiState>(LocationDetailUiState.PlaceUnselected)
     val locationDetailUiState = _locationDetailUiState.asStateFlow()
 
+    private val _cameraPosition = MutableStateFlow(
+        CameraPosition.fromLatLngZoom(LatLng(35.681236, 139.767125), 16.4F)
+    )
+    val cameraPosition = _cameraPosition.asStateFlow()
+
+    private var trackingCamera by mutableStateOf(true)
+
     // ルートのPolylineやナビ情報などをStateで公開
     var routePolyline by mutableStateOf<List<LatLng>>(emptyList())
     var nextTurnInfo by mutableStateOf<String?>(null)
@@ -59,11 +68,24 @@ class NavigationViewModel(
         // navigator.addNavInfoListener { navInfo -> ... } でナビ情報を取得して nextTurnInfo を更新
     }
 
+    fun updateCameraPosition(newPosition: CameraPosition) {
+//        _cameraZoom = zoom ?: _cameraZoom
+//        _cameraPosition.value = CameraPosition.fromLatLngZoom(latLng, zoom ?: _cameraZoom)
+        _cameraPosition.value = newPosition
+    }
+
+    fun moveCamera(latLng: LatLng, zoom: Float? = null) {
+        _cameraPosition.value = CameraPosition.fromLatLngZoom(latLng, zoom ?: _cameraPosition.value.zoom)
+    }
+
     private fun startLocationUpdates() {
         locationRepository.getLocationUpdates()
             .onEach { location ->
                 _currentLocationState.update {
                     it.copy(lastKnownLocation = location, isLoading = false)
+                }.also {
+                    if (trackingCamera)
+                        moveCamera(LatLng(location.latitude, location.longitude))
                 }
             }.catch { e -> Log.e("LocationUpdates", "Error: ${e.message}") }
             .launchIn(viewModelScope)
