@@ -1,14 +1,19 @@
 package com.lunaskyhy.harukaroute.ui.overlay.viewmodel
 
+import android.location.Location
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.Task
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken
+import com.google.android.libraries.places.api.model.CircularBounds
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsResponse
-import com.lunaskyhy.harukaroute.map.MapPlaces
 import com.lunaskyhy.harukaroute.map.PlacesClientProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -33,6 +38,8 @@ class SearchLocationViewModel(
     private val _query = MutableStateFlow("")
     val query = _query.asStateFlow()
 
+    private var _currentLocation: Location? by mutableStateOf(null)
+
     val placeSessionToken: AutocompleteSessionToken = AutocompleteSessionToken.newInstance()
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
@@ -55,19 +62,29 @@ class SearchLocationViewModel(
             Log.d(TAG, "searchUiState: $it")
         }
 
-    fun updateSearchQuery(text: String) {
+    fun updateSearchQuery(text: String, currentLocation: Location?) {
+        _currentLocation = currentLocation
         _query.value = text
     }
 
     private fun getAutocompletePredictions(queryStr: String): Task<FindAutocompletePredictionsResponse> {
-//        val center = LatLng(37.7749, -122.4194)
-//        val locationNearbyCircle = CircularBounds.newInstance(center,  /* radius = */5000.0)
+        val center = _currentLocation
+        lateinit var request: FindAutocompletePredictionsRequest
 
-        val request = FindAutocompletePredictionsRequest.builder()
-            .setSessionToken(placeSessionToken)
-            .setQuery(queryStr)
-//                    .setLocationRestriction(locationNearbyCircle)
-            .build()
+        if (center != null) {
+            val locationNearbyCircle = CircularBounds.newInstance(LatLng(center.latitude, center.longitude),  /* radius = */5000.0)
+            request = FindAutocompletePredictionsRequest.builder()
+                .setSessionToken(placeSessionToken)
+                .setQuery(queryStr)
+                .setLocationRestriction(locationNearbyCircle)
+                .build()
+        } else {
+            request = FindAutocompletePredictionsRequest.builder()
+                .setSessionToken(placeSessionToken)
+                .setQuery(queryStr)
+                .build()
+        }
+
         Log.d(TAG, "request")
 
         return placeClient.getPlacesClient().findAutocompletePredictions(request)

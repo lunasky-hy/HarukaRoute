@@ -61,15 +61,20 @@ fun SearchLocationOverlayScreen(
 ) {
     val query by viewModel.query.collectAsState()
     val autoComplete by viewModel.searchUiState.collectAsStateWithLifecycle()
+    val currentLocation by mapViewModel.currentLocationState.collectAsStateWithLifecycle()
 
     val onSelectLocation = { prediction: AutocompletePrediction ->
         mapViewModel.setLocationDetail(prediction.placeId, viewModel.placeSessionToken)
         navigateToLocationDetail()
     }
 
+    val searchQueryOnChange: (String) -> Unit = { q ->
+        viewModel.updateSearchQuery(q, currentLocation.lastKnownLocation)
+    }
+
     SearchLocationOverlayLayout(
         searchQuery = query,
-        searchQueryOnChange = viewModel::updateSearchQuery,
+        searchQueryOnChange = searchQueryOnChange,
         autocompleteUiState = autoComplete,
         backNavigate = backNavigate,
         onSelectLocation = onSelectLocation,
