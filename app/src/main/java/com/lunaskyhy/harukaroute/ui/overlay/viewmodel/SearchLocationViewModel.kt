@@ -9,6 +9,7 @@ import com.google.android.libraries.places.api.model.AutocompleteSessionToken
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsResponse
 import com.lunaskyhy.harukaroute.map.MapPlaces
+import com.lunaskyhy.harukaroute.map.PlacesClientProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,11 +28,12 @@ const val TAG = "SearchLocationViewModel"
 
 class SearchLocationViewModel(
 //    locationRepository: LocationRepository,
+    private val placeClient: PlacesClientProvider
 ) : ViewModel() {
     private val _query = MutableStateFlow("")
     val query = _query.asStateFlow()
 
-    val placeSessionToken = AutocompleteSessionToken.newInstance()
+    val placeSessionToken: AutocompleteSessionToken = AutocompleteSessionToken.newInstance()
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     val searchUiState: StateFlow<LocationAutocompleteUiState> = query.debounce(500L)
@@ -68,7 +70,7 @@ class SearchLocationViewModel(
             .build()
         Log.d(TAG, "request")
 
-        return MapPlaces.getPlacesClient().findAutocompletePredictions(request)
+        return placeClient.getPlacesClient().findAutocompletePredictions(request)
     }
 
 //    fun currentLocation() {

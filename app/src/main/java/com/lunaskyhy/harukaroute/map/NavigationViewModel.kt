@@ -33,7 +33,8 @@ object LocationDetailSettings {
 }
 
 class NavigationViewModel(
-    private val locationRepository: LocationRepository
+    private val locationRepository: LocationRepository,
+    private val placeClient: PlacesClientProvider,
 ) : ViewModel() {
     // Navigator のインスタンスを保持
     private var navigator: Navigator? = null
@@ -91,7 +92,7 @@ class NavigationViewModel(
     private fun getLocationDetail(placeId: String): Task<FetchPlaceResponse> {
         // Define a place ID.
         val request = FetchPlaceRequest.newInstance(placeId, LocationDetailSettings.placeFields)
-        val placeTask = MapPlaces.getPlacesClient().fetchPlace(request)
+        val placeTask = placeClient.getPlacesClient().fetchPlace(request)
         return placeTask
     }
 }

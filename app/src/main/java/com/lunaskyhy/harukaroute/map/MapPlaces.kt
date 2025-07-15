@@ -6,14 +6,22 @@ import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.lunaskyhy.harukaroute.BuildConfig
 
-object MapPlaces {
+interface PlacesClientProvider {
+    fun getPlacesClient(): PlacesClient
+}
+
+class MapPlaces(context: Context): PlacesClientProvider {
     private lateinit var placesClient: PlacesClient
 
-    fun getPlacesClient(): PlacesClient {
+    init {
+        setup(context)
+    }
+
+    override fun getPlacesClient(): PlacesClient {
         return placesClient
     }
 
-    fun init(context: Context) {
+    private fun setup(context: Context) {
         // Define a variable to hold the Places API key.
         val apiKey = BuildConfig.PLACES_API_KEY
 

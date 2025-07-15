@@ -37,7 +37,6 @@ class MainActivity : ComponentActivity() {
         actionBar?.hide()
 
         if (checkLocationPermission()) {
-            MapPlaces.init(context = applicationContext)
             render()
         } else {
             requestLocationPermission()

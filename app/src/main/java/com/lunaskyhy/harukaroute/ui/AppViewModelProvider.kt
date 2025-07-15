@@ -12,12 +12,15 @@ object AppViewModelProvider {
     val Factory = viewModelFactory {
         initializer {
             NavigationViewModel(
-                myApplication().container.locationRepository
+                locationRepository = myApplication().container.locationRepository,
+                placeClient = myApplication().container.placesClient
             )
         }
 
         initializer {
-            SearchLocationViewModel()
+            SearchLocationViewModel(
+                placeClient = myApplication().container.placesClient
+            )
         }
     }
 }
