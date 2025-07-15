@@ -48,9 +48,14 @@ fun LocationDetailOverlay(
 ) {
     val uiState by mapViewModel.locationDetailUiState.collectAsStateWithLifecycle()
 
+    val closeOnClick = {
+        mapViewModel.closeLocationDetail()
+        backNavigate()
+    }
+
     LocationDetailOverlayLayout(
         uiState = uiState,
-        closeOnClick = backNavigate,
+        closeOnClick = closeOnClick,
     )
 }
 

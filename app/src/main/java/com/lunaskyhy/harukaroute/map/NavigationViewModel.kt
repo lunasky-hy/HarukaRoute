@@ -3,7 +3,6 @@ package com.lunaskyhy.harukaroute.map
 import android.location.Location
 import android.util.Log
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -69,8 +68,6 @@ class NavigationViewModel(
     }
 
     fun updateCameraPosition(newPosition: CameraPosition) {
-//        _cameraZoom = zoom ?: _cameraZoom
-//        _cameraPosition.value = CameraPosition.fromLatLngZoom(latLng, zoom ?: _cameraZoom)
         _cameraPosition.value = newPosition
     }
 
@@ -101,6 +98,8 @@ class NavigationViewModel(
                     // 成功したら、取得したPlaceオブジェクトでSuccess状態に更新
                     val place = response.place
                     _locationDetailUiState.value = LocationDetailUiState.Success(place = place)
+                    trackingCamera = false
+                    moveCamera(place.location ?: _cameraPosition.value.target)
                 }
                 .addOnFailureListener { exception ->
                     // 失敗した場合の処理
@@ -109,6 +108,11 @@ class NavigationViewModel(
                     _locationDetailUiState.value = LocationDetailUiState.Error("場所の詳細取得に失敗しました。$exception")
                 }
         }
+    }
+
+    fun closeLocationDetail() {
+        _locationDetailUiState.value = LocationDetailUiState.PlaceUnselected
+        trackingCamera = true
     }
 
     private fun getLocationDetail(placeId: String): Task<FetchPlaceResponse> {

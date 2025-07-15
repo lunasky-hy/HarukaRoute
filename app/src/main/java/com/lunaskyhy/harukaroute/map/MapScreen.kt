@@ -17,12 +17,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.rememberMarkerState
 import com.google.maps.android.compose.widgets.ScaleBar
 import com.lunaskyhy.harukaroute.R
 import kotlinx.coroutines.FlowPreview
@@ -33,15 +35,13 @@ import kotlinx.coroutines.flow.debounce
 fun MapScreen(
     viewModel: NavigationViewModel
 ) {
-    val uiState by viewModel.currentLocationState.collectAsStateWithLifecycle()
     val cameraPosition by viewModel.cameraPosition.collectAsStateWithLifecycle()
-
     val cameraPositionState = rememberCameraPositionState { position = cameraPosition }
     // 1. ViewModelの状態が変化したら、地図のカメラを動かす (ViewModel -> View)
     LaunchedEffect(cameraPosition) {
         cameraPositionState.animate(
             update = CameraUpdateFactory.newCameraPosition(cameraPosition),
-            durationMs = 500,
+            durationMs = 1000,
         )
     }
     // 2. 地図のカメラがユーザーによって操作されたら、ViewModelに通知する (View -> ViewModel)
@@ -55,15 +55,16 @@ fun MapScreen(
             }
     }
 
+    val detailUiState by viewModel.locationDetailUiState.collectAsStateWithLifecycle()
+    val destinationMarkerState: MarkerState = rememberMarkerState()
+    LaunchedEffect(detailUiState) {
+        if (detailUiState is LocationDetailUiState.Success) {
+            val place = (detailUiState as LocationDetailUiState.Success).place
+            destinationMarkerState.position = place?.location ?: LatLng(0.0, 0.0)
+        }
+    }
+
     val locationSource = remember { MapLocationSource() }
-//    LaunchedEffect(uiState.lastKnownLocation) {
-//        uiState.lastKnownLocation?.let {
-//            locationSource.onLocationChanged(it)
-//            cameraPositionState.position = CameraPosition.fromLatLngZoom(
-//                LatLng(it.latitude, it.longitude), 16f
-//            )
-//        }
-//    }
 
     val uiSettings = MapUiSettings(
         compassEnabled = false,
@@ -86,6 +87,16 @@ fun MapScreen(
             properties = mapProperties,
             uiSettings = uiSettings,
         ) {
+            when (detailUiState) {
+                is LocationDetailUiState.Success -> {
+                    Marker(
+                        state = destinationMarkerState,
+                        title = (detailUiState as LocationDetailUiState.Success).place?.displayName,
+                        snippet = "目的地",
+                    )
+                }
+                else -> {}
+            }
         }
 
         Box(
