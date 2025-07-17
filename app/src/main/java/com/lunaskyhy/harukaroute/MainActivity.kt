@@ -19,8 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.lunaskyhy.harukaroute.map.MapPlaces
-import com.lunaskyhy.harukaroute.map.MapScreen
+import com.lunaskyhy.harukaroute.map.NavigationMapScreen
 import com.lunaskyhy.harukaroute.map.NavigationViewModel
 import com.lunaskyhy.harukaroute.ui.AppViewModelProvider
 import com.lunaskyhy.harukaroute.ui.OverlayNavigation
@@ -56,7 +55,8 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.fillMaxSize().padding(bottom = innerPadding.calculateBottomPadding()),
                         color = MaterialTheme.colorScheme.background
                     ) {
-                        MapScreen(mapViewModel)
+//                        MapScreen(mapViewModel)
+                        NavigationMapScreen(viewModel = mapViewModel)
                         OverlayNavigation(mapViewModel = mapViewModel)
                     }
                 }
