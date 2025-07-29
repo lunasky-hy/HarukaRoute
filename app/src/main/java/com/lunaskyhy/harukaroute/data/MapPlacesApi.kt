@@ -1,4 +1,4 @@
-package com.lunaskyhy.harukaroute.map
+package com.lunaskyhy.harukaroute.data
 
 import android.content.Context
 import android.util.Log
@@ -10,11 +10,12 @@ interface PlacesClientProvider {
     fun getPlacesClient(): PlacesClient
 }
 
-class MapPlaces(context: Context): PlacesClientProvider {
+class MapPlacesApi(context: Context): PlacesClientProvider {
     private lateinit var placesClient: PlacesClient
 
     init {
         setup(context)
+        Log.d("MapPlacesApi", "Initialized")
     }
 
     override fun getPlacesClient(): PlacesClient {

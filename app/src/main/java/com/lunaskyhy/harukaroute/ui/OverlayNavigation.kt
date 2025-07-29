@@ -5,7 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.lunaskyhy.harukaroute.map.NavigationViewModel
+import com.lunaskyhy.harukaroute.map.MyNavigationViewModel
 import com.lunaskyhy.harukaroute.ui.overlay.FreeDriveOverlayScreen
 import com.lunaskyhy.harukaroute.ui.overlay.LocationDetailOverlay
 import com.lunaskyhy.harukaroute.ui.overlay.SearchLocationOverlayScreen
@@ -13,14 +13,13 @@ import com.lunaskyhy.harukaroute.ui.overlay.SearchLocationOverlayScreen
 @Composable
 fun OverlayNavigation(
     modifier: Modifier = Modifier,
-    mapViewModel: NavigationViewModel,
+    mapViewModel: MyNavigationViewModel,
 ) {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = OverlayRoutePath.FREE_DRIVE.name) {
         composable(OverlayRoutePath.FREE_DRIVE.name) {
             FreeDriveOverlayScreen(
-                mapViewModel,
                 toSearchLocation = { navController.navigate(OverlayRoutePath.SEARCH_LOCATION.name) })
         }
         composable(OverlayRoutePath.SEARCH_LOCATION.name) {

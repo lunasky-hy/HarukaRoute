@@ -44,7 +44,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.lunaskyhy.harukaroute.R
-import com.lunaskyhy.harukaroute.map.NavigationViewModel
+import com.lunaskyhy.harukaroute.map.MyNavigationViewModel
 import com.lunaskyhy.harukaroute.tool.toAnnotatedString
 import com.lunaskyhy.harukaroute.ui.AppViewModelProvider
 import com.lunaskyhy.harukaroute.ui.overlay.viewmodel.LocationAutocompleteUiState
@@ -54,7 +54,7 @@ import com.lunaskyhy.harukaroute.ui.theme.AppTypography
 
 @Composable
 fun SearchLocationOverlayScreen(
-    mapViewModel: NavigationViewModel,
+    mapViewModel: MyNavigationViewModel,
     viewModel: SearchLocationViewModel = viewModel(factory = AppViewModelProvider.Factory),
     backNavigate: () -> Unit = {},
     navigateToLocationDetail: () -> Unit = {},

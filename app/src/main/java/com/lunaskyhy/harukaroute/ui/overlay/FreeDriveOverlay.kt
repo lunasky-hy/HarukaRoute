@@ -22,12 +22,10 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lunaskyhy.harukaroute.R
-import com.lunaskyhy.harukaroute.map.NavigationViewModel
 import com.lunaskyhy.harukaroute.ui.theme.AppTheme
 
 @Composable
 fun FreeDriveOverlayScreen(
-    mapViewModel: NavigationViewModel,
     toSearchLocation: () -> Unit = {},
 ) {
     FreeDriveOverlayLayout(toSearchLocation = toSearchLocation)

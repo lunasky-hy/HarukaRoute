@@ -19,8 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.lunaskyhy.harukaroute.map.NavigationMapScreen
-import com.lunaskyhy.harukaroute.map.NavigationViewModel
+import com.lunaskyhy.harukaroute.map.MyNavigationView
+import com.lunaskyhy.harukaroute.map.MyNavigationViewModel
 import com.lunaskyhy.harukaroute.ui.AppViewModelProvider
 import com.lunaskyhy.harukaroute.ui.OverlayNavigation
 import com.lunaskyhy.harukaroute.ui.theme.AppTheme
@@ -45,7 +45,7 @@ class MainActivity : ComponentActivity() {
     private fun render() {
 
         setContent {
-            val mapViewModel: NavigationViewModel = viewModel(factory = AppViewModelProvider.Factory)
+            val mapViewModel: MyNavigationViewModel = viewModel(factory = AppViewModelProvider.Factory)
 
             AppTheme {
                 Scaffold(
@@ -56,7 +56,8 @@ class MainActivity : ComponentActivity() {
                         color = MaterialTheme.colorScheme.background
                     ) {
 //                        MapScreen(mapViewModel)
-                        NavigationMapScreen(viewModel = mapViewModel)
+//                        GoogleMapScreen(viewModel = mapViewModel)
+                        MyNavigationView(viewModel = mapViewModel, activity = this)
                         OverlayNavigation(mapViewModel = mapViewModel)
                     }
                 }

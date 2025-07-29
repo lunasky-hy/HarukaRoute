@@ -35,18 +35,19 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.android.libraries.places.api.model.Place
 import com.lunaskyhy.harukaroute.R
-import com.lunaskyhy.harukaroute.map.LocationDetailUiState
-import com.lunaskyhy.harukaroute.map.NavigationViewModel
+import com.lunaskyhy.harukaroute.map.NavigateLocationUiState
+import com.lunaskyhy.harukaroute.map.MyNavigationViewModel
 import com.lunaskyhy.harukaroute.ui.theme.AppTheme
 import com.lunaskyhy.harukaroute.ui.theme.AppTypography
 
 @Composable
 fun LocationDetailOverlay(
-    mapViewModel: NavigationViewModel,
+    mapViewModel: MyNavigationViewModel,
     backNavigate: () -> Unit = {},
 ) {
-    val uiState by mapViewModel.locationDetailUiState.collectAsStateWithLifecycle()
+    val uiState by mapViewModel.navigateLocationUiState.collectAsStateWithLifecycle()
 
     val closeOnClick = {
         mapViewModel.closeLocationDetail()
@@ -56,15 +57,16 @@ fun LocationDetailOverlay(
     LocationDetailOverlayLayout(
         uiState = uiState,
         closeOnClick = closeOnClick,
+        startNaviOnClick = {mapViewModel.startNavigation(it)}
     )
 }
 
 @Composable
 fun LocationDetailOverlayLayout(
     modifier: Modifier = Modifier,
-    uiState: LocationDetailUiState = LocationDetailUiState.PlaceUnselected,
+    uiState: NavigateLocationUiState = NavigateLocationUiState.PlaceUnselected,
     closeOnClick: () -> Unit = {},
-    startNaviOnClick: () -> Unit = {},
+    startNaviOnClick: (place: Place?) -> Unit = {},
     routePreviewOnClick: () -> Unit = {},
 ) {
     Box(
@@ -83,22 +85,23 @@ fun LocationDetailOverlayLayout(
             )
         ) {
             when (uiState) {
-                is LocationDetailUiState.Success -> {
+                is NavigateLocationUiState.PlaceDetail -> {
                     LocationDetailSuccess(
                         locationPrimaryText = uiState.place?.displayName ?: "",
                         locationSecondaryText = uiState.place?.shortFormattedAddress ?: "",
                         closeOnClick = closeOnClick,
-                        startNaviOnClick = startNaviOnClick,
+                        startNaviOnClick = { startNaviOnClick(uiState.place) },
                         routePreviewOnClick = routePreviewOnClick,
                     )
                 }
-                is LocationDetailUiState.Error -> {
+                is NavigateLocationUiState.Error -> {
                     Text(uiState.exception)
                 }
-                is LocationDetailUiState.Loading -> {
+                is NavigateLocationUiState.Loading -> {
                     Text("読み込み中...")
                 }
-                LocationDetailUiState.PlaceUnselected -> {}
+                is NavigateLocationUiState.RoutePreviewing -> {}
+                NavigateLocationUiState.PlaceUnselected -> {}
             }
         }
     }
@@ -149,7 +152,9 @@ fun ActionButtonGroup(
     routePreviewOnClick: () -> Unit,
 ) {
     Row(
-        modifier = modifier.fillMaxWidth().padding(top = dimensionResource(R.dimen.padding_medium)),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(top = dimensionResource(R.dimen.padding_medium)),
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_medium)),
     ) {
         ActionButton(
