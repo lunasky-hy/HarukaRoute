@@ -2,6 +2,7 @@ package com.lunaskyhy.harukaroute.map
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -101,18 +102,31 @@ fun MyNavigationView(
     AndroidView(
         factory = {
             navigationView.apply {
+                setSpeedLimitIconEnabled(false)
+                setTripProgressBarEnabled(true)
+                setSpeedometerEnabled(true)
+                setRecenterButtonEnabled(true)
+                setReportIncidentButtonEnabled(false)
+                setTrafficPromptsEnabled(true)
+
+                val density = context.resources.displayMetrics.density;
+                val verticalPadding = (24 * density).toInt()
+                setPadding(0, verticalPadding, 0, 0)
+
                 getMapAsync {
+                    Log.d("MyNavigationView", "Map component initialized")
                     onMapReady(it)
                     map = it
                     it.setOnCameraIdleListener {
                         val currentCameraPosition = it.cameraPosition
                         viewModel.updateCameraPosition(currentCameraPosition)
                     }
-                    it.moveCamera(CameraUpdateFactory.newCameraPosition((cameraPosition)))
                     it.isMyLocationEnabled = true
+//                    it.setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding)
                 }
             }
         },
+        modifier = Modifier.fillMaxSize(),
 //        update = { navigationView ->
 //            if (map != null) {
 //

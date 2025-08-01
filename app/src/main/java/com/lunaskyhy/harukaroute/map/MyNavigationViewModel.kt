@@ -43,6 +43,8 @@ object LocationDetailSettings {
     )
 }
 
+const val DETAIL_PLACE_MARKER_CAMERA_ZOOM = 16.1F
+
 class MyNavigationViewModel(
     private val locationRepository: LocationRepository,
     private val placeClient: PlacesClientProvider,
@@ -61,8 +63,6 @@ class MyNavigationViewModel(
     )
     val cameraPosition = _cameraPosition.asStateFlow()
 
-    private var trackingCamera by mutableStateOf(true)
-
     init {
         startLocationUpdates()
     }
@@ -75,14 +75,20 @@ class MyNavigationViewModel(
         // ... Navigatorを初期化して、ナビを開始 ...
         // navigator.setRouteChangedListener { ... } でルート情報を取得して routePolyline を更新
         // navigator.addNavInfoListener { navInfo -> ... } でナビ情報を取得して nextTurnInfo を更新
-        _navigator.value?.let { navigateToPlaceDetail(navigator = it, place = place ?: return) }
+        _navigator.value?.let {
+            navigateToPlaceDetail(navigator = it, place = place ?: return)
+            _navigateLocationUiState.value = NavigateLocationUiState.RoutePreviewing(place = place)
+        }
+
     }
 
     fun updateCameraPosition(newPosition: CameraPosition) {
+        Log.d("CameraPosition", "updateCameraPosition: ${newPosition.target.latitude}, ${newPosition.target.longitude}, zoom: ${newPosition.zoom}")
         _cameraPosition.value = newPosition
     }
 
-    private fun moveCamera(latLng: LatLng, zoom: Float? = null) {
+    private fun moveCamera(latLng: LatLng, zoom: Float?) {
+        Log.d("CameraPosition", "moveCamera: $latLng, zoom: ${zoom ?: _cameraPosition.value.zoom}")
         _cameraPosition.value = CameraPosition.fromLatLngZoom(latLng, zoom ?: _cameraPosition.value.zoom)
     }
 
@@ -91,9 +97,6 @@ class MyNavigationViewModel(
             .onEach { location ->
                 _currentLocationState.update {
                     it.copy(lastKnownLocation = location, isLoading = false)
-                }.also {
-                    if (trackingCamera)
-                        moveCamera(LatLng(location.latitude, location.longitude))
                 }
             }.catch { e -> Log.e("LocationUpdates", "Error: ${e.message}") }
             .launchIn(viewModelScope)
@@ -109,8 +112,7 @@ class MyNavigationViewModel(
                     // 成功したら、取得したPlaceオブジェクトでSuccess状態に更新
                     val place = response.place
                     _navigateLocationUiState.value = NavigateLocationUiState.PlaceDetail(place = place)
-                    trackingCamera = false
-                    moveCamera(place.location ?: _cameraPosition.value.target)
+                    moveCamera(place.location ?: _cameraPosition.value.target, DETAIL_PLACE_MARKER_CAMERA_ZOOM)
                 }
                 .addOnFailureListener { exception ->
                     // 失敗した場合の処理
@@ -123,11 +125,9 @@ class MyNavigationViewModel(
 
     fun closeLocationDetail() {
         _navigateLocationUiState.value = NavigateLocationUiState.PlaceUnselected
-        trackingCamera = true
     }
 
     private fun getLocationDetail(placeId: String): Task<FetchPlaceResponse> {
-        // Define a place ID.
         val request = FetchPlaceRequest.newInstance(placeId, LocationDetailSettings.placeFields)
         val placeTask = placeClient.getPlacesClient().fetchPlace(request)
         return placeTask
@@ -193,6 +193,7 @@ sealed interface NavigateLocationUiState {
     data object PlaceUnselected : NavigateLocationUiState
     data class Loading(val placeId: String, val sessionToken: AutocompleteSessionToken?) : NavigateLocationUiState
     data class PlaceDetail(val place: Place? = null, val isLoading: Boolean = true) : NavigateLocationUiState
-    data class RoutePreviewing(val place: Place? = null) : NavigateLocationUiState
+    data class RoutePreviewing(val place: Place) : NavigateLocationUiState
+    data class RouteNavigating(val place: Place) : NavigateLocationUiState
     data class Error(val exception: String) : NavigateLocationUiState
 }

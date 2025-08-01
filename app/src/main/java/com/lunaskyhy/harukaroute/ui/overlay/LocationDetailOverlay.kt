@@ -101,6 +101,7 @@ fun LocationDetailOverlayLayout(
                     Text("読み込み中...")
                 }
                 is NavigateLocationUiState.RoutePreviewing -> {}
+                is NavigateLocationUiState.RouteNavigating -> {}
                 NavigateLocationUiState.PlaceUnselected -> {}
             }
         }
@@ -142,7 +143,6 @@ fun LocationDetailSuccess(
             routePreviewOnClick = routePreviewOnClick,
         )
     }
-
 }
 
 @Composable
